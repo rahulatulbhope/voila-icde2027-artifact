@@ -13,6 +13,8 @@ __pycache__/
 
 # Large offline datasets and generated model/checkpoint artifacts
 files/
+generated_hf_files/
+hf_generation_outputs/
 model_artifacts/
 scripts/model_artifacts/
 *.joblib
