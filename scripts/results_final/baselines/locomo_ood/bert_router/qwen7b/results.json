@@ -1,0 +1,26 @@
+{
+  "source": "vqav2+gqa",
+  "target": "locomo",
+  "model": "qwen7b",
+  "experiment": "locomo_ood_bert_router",
+  "router_kind": "supervised_fidelity_classifier",
+  "feature_set": "bert",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "accuracy": 54.18502202643172,
+  "avg_cost": 45.573127753303964,
+  "cost_reduction_pct": 54.426872246696036,
+  "fidelity_distribution": {
+    "full": 0.259031,
+    "resize_32x32": 0.122026,
+    "jpeg_q10": 0.147577,
+    "jpeg_q1": 0.211454,
+    "caption": 0.259912
+  },
+  "model_artifact": "model_artifacts\\locomo_ood_bert_router\\vqav2_gqa_to_locomo\\qwen7b\\fold00_LogReg_none_bert_tfidf5000_seed42.joblib"
+}

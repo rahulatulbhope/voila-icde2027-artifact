@@ -1,0 +1,26 @@
+{
+  "source": "vqav2+gqa",
+  "target": "locomo",
+  "model": "pixtral",
+  "experiment": "locomo_ood_bert_router",
+  "router_kind": "supervised_fidelity_classifier",
+  "feature_set": "bert",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "accuracy": 40.220264317180614,
+  "avg_cost": 58.02734948604993,
+  "cost_reduction_pct": 41.97265051395007,
+  "fidelity_distribution": {
+    "full": 0.399559,
+    "caption": 0.235683,
+    "jpeg_q1": 0.079295,
+    "jpeg_q10": 0.235242,
+    "resize_32x32": 0.05022
+  },
+  "model_artifact": "model_artifacts\\locomo_ood_bert_router\\vqav2_gqa_to_locomo\\pixtral\\fold00_LogReg_none_bert_tfidf5000_seed42.joblib"
+}

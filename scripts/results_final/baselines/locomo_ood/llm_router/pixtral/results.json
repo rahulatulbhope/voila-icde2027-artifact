@@ -1,0 +1,38 @@
+{
+  "dataset": "locomo",
+  "model": "pixtral",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "status": "ok",
+  "router_kind": "azure_gpt4o",
+  "routing": "ternary",
+  "n_samples": 2270,
+  "label_distribution": {
+    "medium": 0.73348,
+    "low": 0.242731,
+    "high": 0.023789
+  },
+  "accuracy": 38.54625550660793,
+  "avg_cost": 43.277386196769456,
+  "cost_reduction_pct": 56.72261380323055,
+  "fidelity_distribution": {
+    "jpeg_q10": 0.73348,
+    "caption": 0.242731,
+    "full": 0.023789
+  },
+  "n_errors": 0,
+  "errors_sample": [],
+  "cache_dir": "/home/rbhope/VOILA_code/results/cache/llm_router",
+  "dataset_label_store": "/home/rbhope/VOILA_code/results/cache/llm_router/datasets/locomo_ternary_nall_seed42.json",
+  "n_dataset_labels": 2270,
+  "n_missing_labels_for_model": 0,
+  "source": "zero_shot_prompt_only",
+  "target": "locomo",
+  "experiment": "locomo_ood_llm_router",
+  "reused_from": "scripts\\results_final\\baselines\\llm_router\\locomo\\pixtral\\results.json"
+}

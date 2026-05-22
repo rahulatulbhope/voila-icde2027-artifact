@@ -1,0 +1,90 @@
+{
+  "source": "vqav2+gqa",
+  "target": "locomo",
+  "model": "pixtral",
+  "experiment": "locomo_ood_logprob_cascade",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "cost_accounting": "cumulative_sum_of_all_fidelities_reached",
+  "max_possible_cascade_cost": 213.75,
+  "threshold_method": "pairwise_max_cdf_separation",
+  "thresholds": {
+    "caption->resize_32x32": -0.10599941241525812,
+    "resize_32x32->jpeg_q1": -0.1759255756265842,
+    "jpeg_q1->jpeg_q10": -0.1464261651155539,
+    "jpeg_q10->full": -0.22387937642633915
+  },
+  "threshold_info": {
+    "caption->resize_32x32": {
+      "theta": -0.10599941241525812,
+      "separation": 0.08541639394945899,
+      "cdf_correct": 0.6985998526160648,
+      "cdf_incorrect": 0.7840162465655238,
+      "n_correct": 14927,
+      "n_incorrect": 16742,
+      "status": "ok",
+      "edge": "caption->resize_32x32",
+      "current_fidelity": "caption",
+      "next_fidelity": "resize_32x32",
+      "n_reached_edge": 31669,
+      "n_finite_logprob": 31669
+    },
+    "resize_32x32->jpeg_q1": {
+      "theta": -0.1759255756265842,
+      "separation": 0.09797418787335765,
+      "cdf_correct": 0.5828371278458844,
+      "cdf_incorrect": 0.680811315719242,
+      "n_correct": 8565,
+      "n_incorrect": 14988,
+      "status": "ok",
+      "edge": "resize_32x32->jpeg_q1",
+      "current_fidelity": "resize_32x32",
+      "next_fidelity": "jpeg_q1",
+      "n_reached_edge": 23553,
+      "n_finite_logprob": 23553
+    },
+    "jpeg_q1->jpeg_q10": {
+      "theta": -0.1464261651155539,
+      "separation": 0.35045126162336565,
+      "cdf_correct": 0.335246293639407,
+      "cdf_incorrect": 0.6856975552627727,
+      "n_correct": 8364,
+      "n_incorrect": 6831,
+      "status": "ok",
+      "edge": "jpeg_q1->jpeg_q10",
+      "current_fidelity": "jpeg_q1",
+      "next_fidelity": "jpeg_q10",
+      "n_reached_edge": 15195,
+      "n_finite_logprob": 15195
+    },
+    "jpeg_q10->full": {
+      "theta": -0.22387937642633915,
+      "separation": 0.31522231052511723,
+      "cdf_correct": 0.31036180162441546,
+      "cdf_incorrect": 0.6255841121495327,
+      "n_correct": 4063,
+      "n_incorrect": 3424,
+      "status": "ok",
+      "edge": "jpeg_q10->full",
+      "current_fidelity": "jpeg_q10",
+      "next_fidelity": "full",
+      "n_reached_edge": 7487,
+      "n_finite_logprob": 7487
+    }
+  },
+  "accuracy": 36.0352422907489,
+  "avg_cost": 66.09192364170339,
+  "cost_reduction_pct": 33.90807635829661,
+  "fidelity_distribution": {
+    "caption": 0.360793,
+    "resize_32x32": 0.307048,
+    "jpeg_q1": 0.026872,
+    "full": 0.200441,
+    "jpeg_q10": 0.104846
+  }
+}
