@@ -1,0 +1,14 @@
+{
+  "dataset": "locomo",
+  "model": "pixtral",
+  "oracle_accuracy": 72.6431718061674,
+  "oracle_avg_cost": 46.83898678414097,
+  "fraction_unsolvable": 0.27356828193832594,
+  "fidelity_distribution": {
+    "caption": 0.32511,
+    "jpeg_q1": 0.123348,
+    "jpeg_q10": 0.112775,
+    "full": 0.318943,
+    "resize_32x32": 0.119824
+  }
+}

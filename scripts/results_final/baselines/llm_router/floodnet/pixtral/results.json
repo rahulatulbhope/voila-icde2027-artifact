@@ -1,0 +1,34 @@
+{
+  "dataset": "floodnet",
+  "model": "pixtral",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "status": "ok",
+  "router_kind": "azure_gpt4o",
+  "routing": "ternary",
+  "n_samples": 4511,
+  "label_distribution": {
+    "medium": 0.680559,
+    "high": 0.082465,
+    "low": 0.236976
+  },
+  "accuracy": 34.47129239636445,
+  "avg_cost": 46.28332594398877,
+  "cost_reduction_pct": 53.71667405601123,
+  "fidelity_distribution": {
+    "jpeg_q10": 0.680559,
+    "full": 0.082465,
+    "caption": 0.236976
+  },
+  "n_errors": 0,
+  "errors_sample": [],
+  "cache_dir": "/home/rbhope/VOILA_code/results/cache/llm_router",
+  "dataset_label_store": "/home/rbhope/VOILA_code/results/cache/llm_router/datasets/floodnet_ternary_nall_seed42.json",
+  "n_dataset_labels": 4511,
+  "n_missing_labels_for_model": 0
+}

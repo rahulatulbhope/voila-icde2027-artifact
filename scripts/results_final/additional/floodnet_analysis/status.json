@@ -1,0 +1,6 @@
+{
+  "status": "partial",
+  "what_was_done": "Per-question-type FloodNet accuracy by fidelity was computed from available CSV columns.",
+  "not_done": "Internal VLM resolution caps and visual image inspection require model documentation/raw image files, so this script does not claim that evidence.",
+  "table": "scripts/results_final/additional/tables/floodnet_question_type_accuracy.csv"
+}

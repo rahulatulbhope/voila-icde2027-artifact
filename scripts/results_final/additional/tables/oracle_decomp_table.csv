@@ -1,0 +1,9 @@
+dataset,model,category,percentage,count,n
+vqav2,pixtral,correct_routing,23.536272451597853,5045,21435
+vqav2,pixtral,irreducible_error,12.680195941217635,2718,21435
+vqav2,pixtral,over_escalation_error,40.73244693258689,8731,21435
+vqav2,pixtral,under_escalation_error,23.05108467459762,4941,21435
+gqa,pixtral,correct_routing,29.65604846589799,3035,10234
+gqa,pixtral,irreducible_error,15.174907172171196,1553,10234
+gqa,pixtral,over_escalation_error,30.115301934727377,3082,10234
+gqa,pixtral,under_escalation_error,25.05374242720344,2564,10234

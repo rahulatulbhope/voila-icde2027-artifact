@@ -1,0 +1,15 @@
+table,path,bytes
+cascade_degeneracy_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\cascade_degeneracy_table.csv,2106
+ece_calibration_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\ece_calibration_table.csv,1166
+ece_calibration_table.tex,D:\VOILA_code\scripts\results_final\additional\tables\ece_calibration_table.tex,891
+feature_ood_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\feature_ood_table.csv,3662
+feature_ood_table.tex,D:\VOILA_code\scripts\results_final\additional\tables\feature_ood_table.tex,3022
+fidelity_saturation_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\fidelity_saturation_table.csv,3315
+floodnet_question_type_accuracy.csv,D:\VOILA_code\scripts\results_final\additional\tables\floodnet_question_type_accuracy.csv,7732
+iso_accuracy_contour_data.csv,D:\VOILA_code\scripts\results_final\additional\tables\iso_accuracy_contour_data.csv,2616
+ood_extended_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\ood_extended_table.csv,202397
+ood_extended_table.tex,D:\VOILA_code\scripts\results_final\additional\tables\ood_extended_table.tex,201686
+oracle_decomp_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\oracle_decomp_table.csv,549
+roc_escalation_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\roc_escalation_table.csv,303
+routing_words_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\routing_words_table.csv,2555
+tfidf_vocab_table.csv,D:\VOILA_code\scripts\results_final\additional\tables\tfidf_vocab_table.csv,68973

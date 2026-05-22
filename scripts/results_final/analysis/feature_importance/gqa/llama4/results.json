@@ -1,0 +1,416 @@
+{
+  "dataset": "gqa",
+  "model": "llama4",
+  "top_features": {
+    "caption": [
+      {
+        "feature": "the",
+        "importance": 0.23661139235733708
+      },
+      {
+        "feature": "it",
+        "importance": 0.11039364143111652
+      },
+      {
+        "feature": "animal",
+        "importance": 0.1096649975393612
+      },
+      {
+        "feature": "who",
+        "importance": 0.02579002382248006
+      },
+      {
+        "feature": "place",
+        "importance": 0.0257784407249797
+      },
+      {
+        "feature": "this",
+        "importance": 0.020358768040167695
+      },
+      {
+        "feature": "a",
+        "importance": 0.017205960877659333
+      },
+      {
+        "feature": "man",
+        "importance": 0.015998890880494485
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.015350262653424698
+      },
+      {
+        "feature": "there",
+        "importance": 0.014291921307286211
+      },
+      {
+        "feature": "of",
+        "importance": 0.013180488157587943
+      },
+      {
+        "feature": "vehicle",
+        "importance": 0.01273163012737681
+      },
+      {
+        "feature": "to",
+        "importance": 0.012496826974019474
+      },
+      {
+        "feature": "have",
+        "importance": 0.01173499325779214
+      },
+      {
+        "feature": "made",
+        "importance": 0.010720038461001611
+      },
+      {
+        "feature": "animals",
+        "importance": 0.010414718525981206
+      },
+      {
+        "feature": "sky",
+        "importance": 0.01016137381409914
+      },
+      {
+        "feature": "fruit",
+        "importance": 0.00977187766135736
+      },
+      {
+        "feature": "what",
+        "importance": 0.00969609316178153
+      },
+      {
+        "feature": "called?",
+        "importance": 0.009414977694018205
+      }
+    ],
+    "resize_32x32": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.2764500036338563
+      },
+      {
+        "feature": "side",
+        "importance": 0.14899565612170412
+      },
+      {
+        "feature": "or",
+        "importance": 0.08933804641990442
+      },
+      {
+        "feature": "it",
+        "importance": 0.058547904878178285
+      },
+      {
+        "feature": "has_wh_word",
+        "importance": 0.032003323539388645
+      },
+      {
+        "feature": "the",
+        "importance": 0.019972194754822217
+      },
+      {
+        "feature": "both",
+        "importance": 0.016981990974922
+      },
+      {
+        "feature": "sky",
+        "importance": 0.015274088569296152
+      },
+      {
+        "feature": "who",
+        "importance": 0.014771764833154125
+      },
+      {
+        "feature": "place",
+        "importance": 0.011579514177712814
+      },
+      {
+        "feature": "grass",
+        "importance": 0.010531890632590976
+      },
+      {
+        "feature": "is",
+        "importance": 0.009643579852332784
+      },
+      {
+        "feature": "happy",
+        "importance": 0.009090191372515455
+      },
+      {
+        "feature": "that",
+        "importance": 0.008496410617211732
+      },
+      {
+        "feature": "there",
+        "importance": 0.008266436358980837
+      },
+      {
+        "feature": "device",
+        "importance": 0.007757984568275415
+      },
+      {
+        "feature": "and",
+        "importance": 0.006657745744986499
+      },
+      {
+        "feature": "person",
+        "importance": 0.006559776622172018
+      },
+      {
+        "feature": "animal",
+        "importance": 0.0061553872636438516
+      },
+      {
+        "feature": "photograph?",
+        "importance": 0.006026853554470978
+      }
+    ],
+    "jpeg_q1": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.16695017625652225
+      },
+      {
+        "feature": "side",
+        "importance": 0.134277545701174
+      },
+      {
+        "feature": "or",
+        "importance": 0.10455761183544465
+      },
+      {
+        "feature": "animal",
+        "importance": 0.03983090765271331
+      },
+      {
+        "feature": "the",
+        "importance": 0.035936073942854696
+      },
+      {
+        "feature": "it",
+        "importance": 0.030142605609704193
+      },
+      {
+        "feature": "there",
+        "importance": 0.027343495398155726
+      },
+      {
+        "feature": "who",
+        "importance": 0.027216684995898768
+      },
+      {
+        "feature": "vehicle",
+        "importance": 0.019971623035276696
+      },
+      {
+        "feature": "device",
+        "importance": 0.01617979781810751
+      },
+      {
+        "feature": "this",
+        "importance": 0.015873989233243953
+      },
+      {
+        "feature": "is",
+        "importance": 0.015564408352411453
+      },
+      {
+        "feature": "of",
+        "importance": 0.015016781477365165
+      },
+      {
+        "feature": "happy",
+        "importance": 0.013833244105959517
+      },
+      {
+        "feature": "not",
+        "importance": 0.012491433477185865
+      },
+      {
+        "feature": "common?",
+        "importance": 0.01221266926675894
+      },
+      {
+        "feature": "in",
+        "importance": 0.011275768923559252
+      },
+      {
+        "feature": "do",
+        "importance": 0.011257633266302873
+      },
+      {
+        "feature": "place",
+        "importance": 0.010424233047186192
+      },
+      {
+        "feature": "top",
+        "importance": 0.009955938092711291
+      }
+    ],
+    "jpeg_q10": [
+      {
+        "feature": "or",
+        "importance": 0.10822086655222204
+      },
+      {
+        "feature": "side",
+        "importance": 0.1058694944926169
+      },
+      {
+        "feature": "is_yes_no",
+        "importance": 0.07208046778610225
+      },
+      {
+        "feature": "animal",
+        "importance": 0.06432273580568942
+      },
+      {
+        "feature": "there",
+        "importance": 0.05252739247745995
+      },
+      {
+        "feature": "the",
+        "importance": 0.04714579631769777
+      },
+      {
+        "feature": "it",
+        "importance": 0.037447048510918825
+      },
+      {
+        "feature": "device",
+        "importance": 0.028721971129249953
+      },
+      {
+        "feature": "who",
+        "importance": 0.025715873547677483
+      },
+      {
+        "feature": "place",
+        "importance": 0.02308460704408265
+      },
+      {
+        "feature": "common?",
+        "importance": 0.020748003475752654
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.016871215540218604
+      },
+      {
+        "feature": "is",
+        "importance": 0.01631776097622694
+      },
+      {
+        "feature": "of",
+        "importance": 0.015996624492543684
+      },
+      {
+        "feature": "in",
+        "importance": 0.014314237293918704
+      },
+      {
+        "feature": "happy",
+        "importance": 0.01357648843140358
+      },
+      {
+        "feature": "see",
+        "importance": 0.012044474427650586
+      },
+      {
+        "feature": "man",
+        "importance": 0.010923958508677814
+      },
+      {
+        "feature": "on?",
+        "importance": 0.009450152876500958
+      },
+      {
+        "feature": "and",
+        "importance": 0.008918640805335894
+      }
+    ],
+    "full": [
+      {
+        "feature": "or",
+        "importance": 0.10412693035902436
+      },
+      {
+        "feature": "side",
+        "importance": 0.10208208658949787
+      },
+      {
+        "feature": "animal",
+        "importance": 0.0626243549407388
+      },
+      {
+        "feature": "there",
+        "importance": 0.05393210247402658
+      },
+      {
+        "feature": "is_yes_no",
+        "importance": 0.044507794023062555
+      },
+      {
+        "feature": "it",
+        "importance": 0.04247950308763994
+      },
+      {
+        "feature": "see",
+        "importance": 0.04120581168122873
+      },
+      {
+        "feature": "place",
+        "importance": 0.041076179300104425
+      },
+      {
+        "feature": "the",
+        "importance": 0.03999882022473343
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.019802373479909294
+      },
+      {
+        "feature": "man",
+        "importance": 0.015417927674176796
+      },
+      {
+        "feature": "have",
+        "importance": 0.013511826632855883
+      },
+      {
+        "feature": "front",
+        "importance": 0.013304157051888088
+      },
+      {
+        "feature": "who",
+        "importance": 0.012772849512162439
+      },
+      {
+        "feature": "happy",
+        "importance": 0.011325613028526369
+      },
+      {
+        "feature": "common?",
+        "importance": 0.011173596930723404
+      },
+      {
+        "feature": "sign?",
+        "importance": 0.011026047991588489
+      },
+      {
+        "feature": "of",
+        "importance": 0.010566790160391176
+      },
+      {
+        "feature": "this",
+        "importance": 0.009997883278582304
+      },
+      {
+        "feature": "does",
+        "importance": 0.009371000190428073
+      }
+    ]
+  }
+}

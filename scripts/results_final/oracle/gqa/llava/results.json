@@ -1,0 +1,14 @@
+{
+  "dataset": "gqa",
+  "model": "llava",
+  "oracle_accuracy": 87.34610123119015,
+  "oracle_avg_cost": 24.276985212689727,
+  "fraction_unsolvable": 0.12653898768809846,
+  "fidelity_distribution": {
+    "caption": 0.632109,
+    "full": 0.142369,
+    "resize_32x32": 0.162302,
+    "jpeg_q10": 0.026383,
+    "jpeg_q1": 0.036838
+  }
+}

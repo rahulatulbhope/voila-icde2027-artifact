@@ -1,0 +1,14 @@
+{
+  "dataset": "floodnet",
+  "model": "llama4",
+  "oracle_accuracy": 84.01684770560851,
+  "oracle_avg_cost": 34.91350772186507,
+  "fraction_unsolvable": 0.1598315229439149,
+  "fidelity_distribution": {
+    "full": 0.21237,
+    "jpeg_q1": 0.095988,
+    "caption": 0.420528,
+    "resize_32x32": 0.198626,
+    "jpeg_q10": 0.072489
+  }
+}

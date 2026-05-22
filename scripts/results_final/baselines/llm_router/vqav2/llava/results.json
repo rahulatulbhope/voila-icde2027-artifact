@@ -1,0 +1,34 @@
+{
+  "dataset": "vqav2",
+  "model": "llava",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "status": "ok",
+  "router_kind": "azure_gpt4o",
+  "routing": "ternary",
+  "n_samples": 21435,
+  "label_distribution": {
+    "medium": 0.703102,
+    "low": 0.194542,
+    "high": 0.102356
+  },
+  "accuracy": 67.46909260555168,
+  "avg_cost": 49.1510730114299,
+  "cost_reduction_pct": 50.8489269885701,
+  "fidelity_distribution": {
+    "jpeg_q10": 0.703102,
+    "caption": 0.194542,
+    "full": 0.102356
+  },
+  "n_errors": 0,
+  "errors_sample": [],
+  "cache_dir": "/home/rbhope/VOILA_code/results/cache/llm_router",
+  "dataset_label_store": "/home/rbhope/VOILA_code/results/cache/llm_router/datasets/vqav2_ternary_nall_seed42.json",
+  "n_dataset_labels": 21435,
+  "n_missing_labels_for_model": 0
+}

@@ -1,0 +1,11 @@
+{
+  "dataset": "gqa",
+  "model": "llama4",
+  "status": "ok",
+  "median_logprob_correct": -0.06773846239435671,
+  "median_logprob_incorrect": -0.004605954090948217,
+  "overlap_fraction": 0.7411061285500747,
+  "sentence": "74.1% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 3544,
+  "n_incorrect_caption": 6690
+}

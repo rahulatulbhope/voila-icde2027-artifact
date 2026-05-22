@@ -1,0 +1,14 @@
+{
+  "dataset": "gqa",
+  "model": "qwen235b",
+  "oracle_accuracy": 83.77955833496189,
+  "oracle_avg_cost": 34.03029118624194,
+  "fraction_unsolvable": 0.1622044166503811,
+  "fidelity_distribution": {
+    "full": 0.19103,
+    "caption": 0.290014,
+    "resize_32x32": 0.346394,
+    "jpeg_q1": 0.109341,
+    "jpeg_q10": 0.063221
+  }
+}

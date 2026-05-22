@@ -1,0 +1,14 @@
+{
+  "dataset": "textvqa",
+  "model": "qwen72b",
+  "oracle_accuracy": 99.21243523316062,
+  "oracle_avg_cost": 17.526252158894646,
+  "fraction_unsolvable": 0.00787564766839377,
+  "fidelity_distribution": {
+    "caption": 0.733161,
+    "resize_32x32": 0.055648,
+    "jpeg_q1": 0.100725,
+    "jpeg_q10": 0.079793,
+    "full": 0.030674
+  }
+}

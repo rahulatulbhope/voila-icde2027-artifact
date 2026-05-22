@@ -1,0 +1,11 @@
+{
+  "dataset": "locomo",
+  "model": "qwen7b",
+  "status": "ok",
+  "median_logprob_correct": 0.0,
+  "median_logprob_incorrect": 0.0,
+  "overlap_fraction": 0.0,
+  "sentence": "0.0% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 608,
+  "n_incorrect_caption": 1662
+}

@@ -1,0 +1,11 @@
+{
+  "dataset": "textvqa",
+  "model": "pixtral",
+  "status": "ok",
+  "median_logprob_correct": -0.021211769404612824,
+  "median_logprob_incorrect": -0.10099957222337252,
+  "overlap_fraction": 0.09331337325349301,
+  "sentence": "9.3% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 7096,
+  "n_incorrect_caption": 2004
+}

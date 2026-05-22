@@ -1,0 +1,14 @@
+{
+  "dataset": "textvqa",
+  "model": "pixtral",
+  "oracle_accuracy": 91.3076923076923,
+  "oracle_avg_cost": 21.087481684981686,
+  "fraction_unsolvable": 0.08692307692307688,
+  "fidelity_distribution": {
+    "caption": 0.77978,
+    "jpeg_q10": 0.036374,
+    "full": 0.115604,
+    "resize_32x32": 0.03978,
+    "jpeg_q1": 0.028462
+  }
+}

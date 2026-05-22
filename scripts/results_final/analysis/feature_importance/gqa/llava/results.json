@@ -1,0 +1,416 @@
+{
+  "dataset": "gqa",
+  "model": "llava",
+  "top_features": {
+    "caption": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.27630382814738136
+      },
+      {
+        "feature": "the",
+        "importance": 0.1399743018960715
+      },
+      {
+        "feature": "animal",
+        "importance": 0.08543155350917159
+      },
+      {
+        "feature": "or",
+        "importance": 0.0693483888822523
+      },
+      {
+        "feature": "color",
+        "importance": 0.03187304129157687
+      },
+      {
+        "feature": "who",
+        "importance": 0.030954816083042305
+      },
+      {
+        "feature": "does",
+        "importance": 0.02334305505083791
+      },
+      {
+        "feature": "wearing?",
+        "importance": 0.01668220071449789
+      },
+      {
+        "feature": "front",
+        "importance": 0.014020510470865121
+      },
+      {
+        "feature": "there",
+        "importance": 0.01347144402573916
+      },
+      {
+        "feature": "where",
+        "importance": 0.013242253192217637
+      },
+      {
+        "feature": "black?",
+        "importance": 0.009777211712093203
+      },
+      {
+        "feature": "left",
+        "importance": 0.00942984529992973
+      },
+      {
+        "feature": "is",
+        "importance": 0.009075064191503151
+      },
+      {
+        "feature": "doors",
+        "importance": 0.008976499752368566
+      },
+      {
+        "feature": "located",
+        "importance": 0.007176998729022587
+      },
+      {
+        "feature": "sky",
+        "importance": 0.007013358697195746
+      },
+      {
+        "feature": "has_wh_word",
+        "importance": 0.006192375589460612
+      },
+      {
+        "feature": "it",
+        "importance": 0.006073735196644169
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.006037211926591055
+      }
+    ],
+    "resize_32x32": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.24243971766906777
+      },
+      {
+        "feature": "or",
+        "importance": 0.12409050332359928
+      },
+      {
+        "feature": "side",
+        "importance": 0.09000922796110114
+      },
+      {
+        "feature": "the",
+        "importance": 0.049094672322886085
+      },
+      {
+        "feature": "different",
+        "importance": 0.02494656719563699
+      },
+      {
+        "feature": "what",
+        "importance": 0.02340668688385643
+      },
+      {
+        "feature": "which",
+        "importance": 0.019184936148758488
+      },
+      {
+        "feature": "animal",
+        "importance": 0.014407329146490695
+      },
+      {
+        "feature": "vehicle",
+        "importance": 0.014058182604617704
+      },
+      {
+        "feature": "is",
+        "importance": 0.013798842558110092
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.011706572109487294
+      },
+      {
+        "feature": "device",
+        "importance": 0.010262032285875631
+      },
+      {
+        "feature": "it",
+        "importance": 0.009757279124706354
+      },
+      {
+        "feature": "what's",
+        "importance": 0.009109443152766324
+      },
+      {
+        "feature": "common?",
+        "importance": 0.009004794075855275
+      },
+      {
+        "feature": "of",
+        "importance": 0.008991298951621192
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.008501584034108155
+      },
+      {
+        "feature": "are",
+        "importance": 0.008412881802391164
+      },
+      {
+        "feature": "made",
+        "importance": 0.008248106534915298
+      },
+      {
+        "feature": "located",
+        "importance": 0.008245555326297999
+      }
+    ],
+    "jpeg_q1": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.2616957873684818
+      },
+      {
+        "feature": "or",
+        "importance": 0.1287106688754978
+      },
+      {
+        "feature": "side",
+        "importance": 0.08335497974626165
+      },
+      {
+        "feature": "the",
+        "importance": 0.042392785384124186
+      },
+      {
+        "feature": "what",
+        "importance": 0.03047797067810903
+      },
+      {
+        "feature": "color",
+        "importance": 0.027527805570255293
+      },
+      {
+        "feature": "animal",
+        "importance": 0.022254814516564077
+      },
+      {
+        "feature": "vehicle",
+        "importance": 0.01640814153959151
+      },
+      {
+        "feature": "front",
+        "importance": 0.015840543874493573
+      },
+      {
+        "feature": "in",
+        "importance": 0.013951441945569434
+      },
+      {
+        "feature": "where",
+        "importance": 0.013057158605004709
+      },
+      {
+        "feature": "it",
+        "importance": 0.011986854420416684
+      },
+      {
+        "feature": "are",
+        "importance": 0.01137579066128163
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.01093322889335737
+      },
+      {
+        "feature": "is",
+        "importance": 0.009176449945393152
+      },
+      {
+        "feature": "and",
+        "importance": 0.008096341505444787
+      },
+      {
+        "feature": "clothing",
+        "importance": 0.007290118492404968
+      },
+      {
+        "feature": "common?",
+        "importance": 0.007288707911895615
+      },
+      {
+        "feature": "left",
+        "importance": 0.0068129885751211
+      },
+      {
+        "feature": "device",
+        "importance": 0.006630159737807018
+      }
+    ],
+    "jpeg_q10": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.16719587384914208
+      },
+      {
+        "feature": "or",
+        "importance": 0.13892900764340066
+      },
+      {
+        "feature": "side",
+        "importance": 0.0648509595656054
+      },
+      {
+        "feature": "animal",
+        "importance": 0.06106071799685775
+      },
+      {
+        "feature": "color",
+        "importance": 0.04551604200186916
+      },
+      {
+        "feature": "the",
+        "importance": 0.03828052111630166
+      },
+      {
+        "feature": "what",
+        "importance": 0.024795191653927726
+      },
+      {
+        "feature": "where",
+        "importance": 0.019108908871516644
+      },
+      {
+        "feature": "of",
+        "importance": 0.01162128138490852
+      },
+      {
+        "feature": "in",
+        "importance": 0.010704404149726371
+      },
+      {
+        "feature": "device",
+        "importance": 0.010622365332773684
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.01049694758191068
+      },
+      {
+        "feature": "wearing?",
+        "importance": 0.010438840563967464
+      },
+      {
+        "feature": "which",
+        "importance": 0.010294687588651699
+      },
+      {
+        "feature": "front",
+        "importance": 0.010042745876628682
+      },
+      {
+        "feature": "same",
+        "importance": 0.009927597991083397
+      },
+      {
+        "feature": "to",
+        "importance": 0.00940718739810506
+      },
+      {
+        "feature": "building",
+        "importance": 0.009015784460511198
+      },
+      {
+        "feature": "a",
+        "importance": 0.008526740655123254
+      },
+      {
+        "feature": "not",
+        "importance": 0.00827748304006097
+      }
+    ],
+    "full": [
+      {
+        "feature": "or",
+        "importance": 0.1717388430112557
+      },
+      {
+        "feature": "is_yes_no",
+        "importance": 0.13092964311261407
+      },
+      {
+        "feature": "side",
+        "importance": 0.07462447335427796
+      },
+      {
+        "feature": "animal",
+        "importance": 0.05208350222803421
+      },
+      {
+        "feature": "same",
+        "importance": 0.024935242824798247
+      },
+      {
+        "feature": "the",
+        "importance": 0.02425936095139092
+      },
+      {
+        "feature": "different",
+        "importance": 0.024114345498645273
+      },
+      {
+        "feature": "what",
+        "importance": 0.02182829583144277
+      },
+      {
+        "feature": "front",
+        "importance": 0.021782131467889092
+      },
+      {
+        "feature": "where",
+        "importance": 0.021038689230955802
+      },
+      {
+        "feature": "which",
+        "importance": 0.020333729051267478
+      },
+      {
+        "feature": "is",
+        "importance": 0.01826430884721506
+      },
+      {
+        "feature": "wearing?",
+        "importance": 0.017121609052139556
+      },
+      {
+        "feature": "color",
+        "importance": 0.014798562145295608
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.01328512908419469
+      },
+      {
+        "feature": "wear?",
+        "importance": 0.010243426832059407
+      },
+      {
+        "feature": "dirt?",
+        "importance": 0.010130321438927843
+      },
+      {
+        "feature": "do",
+        "importance": 0.010062803064411895
+      },
+      {
+        "feature": "are",
+        "importance": 0.009352360054930826
+      },
+      {
+        "feature": "to",
+        "importance": 0.008762835037156557
+      }
+    ]
+  }
+}

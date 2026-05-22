@@ -1,0 +1,11 @@
+{
+  "dataset": "gqa",
+  "model": "qwen235b",
+  "status": "ok",
+  "median_logprob_correct": -0.04461970067616032,
+  "median_logprob_incorrect": -0.0002976701520083225,
+  "overlap_fraction": 0.8309936691439581,
+  "sentence": "83.1% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 2968,
+  "n_incorrect_caption": 7266
+}

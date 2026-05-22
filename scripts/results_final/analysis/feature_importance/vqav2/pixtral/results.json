@@ -1,0 +1,416 @@
+{
+  "dataset": "vqav2",
+  "model": "pixtral",
+  "top_features": {
+    "caption": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.43079758270576535
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.02929293551657753
+      },
+      {
+        "feature": "time",
+        "importance": 0.027028648758345115
+      },
+      {
+        "feature": "doing?",
+        "importance": 0.02697551992167575
+      },
+      {
+        "feature": "what",
+        "importance": 0.021708949201298483
+      },
+      {
+        "feature": "this?",
+        "importance": 0.021050414357360284
+      },
+      {
+        "feature": "how",
+        "importance": 0.018856125650825194
+      },
+      {
+        "feature": "color",
+        "importance": 0.012441115352035372
+      },
+      {
+        "feature": "holding?",
+        "importance": 0.012069073337138005
+      },
+      {
+        "feature": "did",
+        "importance": 0.011763543630785531
+      },
+      {
+        "feature": "happy?",
+        "importance": 0.011183957672854627
+      },
+      {
+        "feature": "it",
+        "importance": 0.010358095948283054
+      },
+      {
+        "feature": "the",
+        "importance": 0.010138290563081782
+      },
+      {
+        "feature": "a",
+        "importance": 0.009728819087587236
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.009143749773225709
+      },
+      {
+        "feature": "of",
+        "importance": 0.00892193210899117
+      },
+      {
+        "feature": "in",
+        "importance": 0.008556495167662383
+      },
+      {
+        "feature": "zoo?",
+        "importance": 0.0081337284940917
+      },
+      {
+        "feature": "grass?",
+        "importance": 0.007778490412827846
+      },
+      {
+        "feature": "on",
+        "importance": 0.0076240038824248145
+      }
+    ],
+    "resize_32x32": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.7166063585077754
+      },
+      {
+        "feature": "color",
+        "importance": 0.016468228569754478
+      },
+      {
+        "feature": "would",
+        "importance": 0.013454573260166676
+      },
+      {
+        "feature": "has_wh_word",
+        "importance": 0.010649313987078258
+      },
+      {
+        "feature": "snow?",
+        "importance": 0.010450439278147969
+      },
+      {
+        "feature": "grass?",
+        "importance": 0.008715774737596901
+      },
+      {
+        "feature": "the",
+        "importance": 0.008536569558884688
+      },
+      {
+        "feature": "is",
+        "importance": 0.008089665855733312
+      },
+      {
+        "feature": "be",
+        "importance": 0.007991184224207226
+      },
+      {
+        "feature": "colors",
+        "importance": 0.007153344518080557
+      },
+      {
+        "feature": "what",
+        "importance": 0.007062853324460033
+      },
+      {
+        "feature": "made",
+        "importance": 0.006894717491868544
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.0066019739136867995
+      },
+      {
+        "feature": "should",
+        "importance": 0.0063361478682069355
+      },
+      {
+        "feature": "or",
+        "importance": 0.006257906982217035
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.0049898286417995805
+      },
+      {
+        "feature": "will",
+        "importance": 0.004712525738753451
+      },
+      {
+        "feature": "where",
+        "importance": 0.004207719427034954
+      },
+      {
+        "feature": "toilet?",
+        "importance": 0.003956234514564601
+      },
+      {
+        "feature": "and",
+        "importance": 0.0037605597976295233
+      }
+    ],
+    "jpeg_q1": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.451655313763107
+      },
+      {
+        "feature": "color",
+        "importance": 0.08425601334673304
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.026725345620200108
+      },
+      {
+        "feature": "the",
+        "importance": 0.025116587838750707
+      },
+      {
+        "feature": "room",
+        "importance": 0.021573228520803477
+      },
+      {
+        "feature": "sport",
+        "importance": 0.01896758237349085
+      },
+      {
+        "feature": "on",
+        "importance": 0.018091066181385472
+      },
+      {
+        "feature": "where",
+        "importance": 0.016984069319034074
+      },
+      {
+        "feature": "why",
+        "importance": 0.013591335268120482
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.011861275471447394
+      },
+      {
+        "feature": "cat",
+        "importance": 0.008539958685749912
+      },
+      {
+        "feature": "is",
+        "importance": 0.008491324237529081
+      },
+      {
+        "feature": "this?",
+        "importance": 0.008369190715382417
+      },
+      {
+        "feature": "train?",
+        "importance": 0.007817246604006454
+      },
+      {
+        "feature": "time",
+        "importance": 0.007327997028819863
+      },
+      {
+        "feature": "a",
+        "importance": 0.0067144723232958675
+      },
+      {
+        "feature": "one",
+        "importance": 0.006169072801463679
+      },
+      {
+        "feature": "man's",
+        "importance": 0.005857150997520911
+      },
+      {
+        "feature": "name",
+        "importance": 0.0054473069908435754
+      },
+      {
+        "feature": "his",
+        "importance": 0.005345443870456904
+      }
+    ],
+    "jpeg_q10": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.3099190834697476
+      },
+      {
+        "feature": "color",
+        "importance": 0.09893813816624225
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.06249073540713685
+      },
+      {
+        "feature": "what",
+        "importance": 0.05056761626160442
+      },
+      {
+        "feature": "the",
+        "importance": 0.0373481848434986
+      },
+      {
+        "feature": "why",
+        "importance": 0.02850431385118236
+      },
+      {
+        "feature": "sport",
+        "importance": 0.02005704927382045
+      },
+      {
+        "feature": "time",
+        "importance": 0.01935218315528515
+      },
+      {
+        "feature": "room",
+        "importance": 0.019271192740162542
+      },
+      {
+        "feature": "on",
+        "importance": 0.01740096755697548
+      },
+      {
+        "feature": "how",
+        "importance": 0.01631766320793163
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.015574865026587333
+      },
+      {
+        "feature": "where",
+        "importance": 0.008509547415865706
+      },
+      {
+        "feature": "baby",
+        "importance": 0.008312299450976918
+      },
+      {
+        "feature": "this?",
+        "importance": 0.007586814535534827
+      },
+      {
+        "feature": "kind",
+        "importance": 0.006967452900882959
+      },
+      {
+        "feature": "does",
+        "importance": 0.006952492527505871
+      },
+      {
+        "feature": "that",
+        "importance": 0.006939613237641342
+      },
+      {
+        "feature": "is",
+        "importance": 0.00691375748217396
+      },
+      {
+        "feature": "has",
+        "importance": 0.006042559923062233
+      }
+    ],
+    "full": [
+      {
+        "feature": "is_yes_no",
+        "importance": 0.2803784732514593
+      },
+      {
+        "feature": "what",
+        "importance": 0.08149210599206216
+      },
+      {
+        "feature": "color",
+        "importance": 0.07483666656042878
+      },
+      {
+        "feature": "len_tokens",
+        "importance": 0.05684089186524757
+      },
+      {
+        "feature": "time",
+        "importance": 0.04211645725803551
+      },
+      {
+        "feature": "why",
+        "importance": 0.0261673594910512
+      },
+      {
+        "feature": "the",
+        "importance": 0.018834279722099626
+      },
+      {
+        "feature": "has_spatial_word",
+        "importance": 0.017516057218246815
+      },
+      {
+        "feature": "sport",
+        "importance": 0.016386322679561627
+      },
+      {
+        "feature": "starts_how",
+        "importance": 0.015216286061715573
+      },
+      {
+        "feature": "where",
+        "importance": 0.013621552842577735
+      },
+      {
+        "feature": "room",
+        "importance": 0.013414851460175849
+      },
+      {
+        "feature": "how",
+        "importance": 0.011157961858178429
+      },
+      {
+        "feature": "many",
+        "importance": 0.010336475246869255
+      },
+      {
+        "feature": "this",
+        "importance": 0.010129284203805343
+      },
+      {
+        "feature": "in",
+        "importance": 0.010117141256070637
+      },
+      {
+        "feature": "is",
+        "importance": 0.009736088658501563
+      },
+      {
+        "feature": "does",
+        "importance": 0.009309887610113907
+      },
+      {
+        "feature": "to",
+        "importance": 0.008011904125579929
+      },
+      {
+        "feature": "man's",
+        "importance": 0.007378934889825146
+      }
+    ]
+  }
+}

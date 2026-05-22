@@ -1,0 +1,14 @@
+{
+  "dataset": "vqav2",
+  "model": "qwen7b",
+  "oracle_accuracy": 88.01492885467694,
+  "oracle_avg_cost": 31.68986470725449,
+  "fraction_unsolvable": 0.11985071145323067,
+  "fidelity_distribution": {
+    "full": 0.163331,
+    "jpeg_q10": 0.080476,
+    "caption": 0.358899,
+    "resize_32x32": 0.293679,
+    "jpeg_q1": 0.103616
+  }
+}

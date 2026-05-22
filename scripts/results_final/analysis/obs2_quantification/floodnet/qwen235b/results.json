@@ -1,0 +1,11 @@
+{
+  "dataset": "floodnet",
+  "model": "qwen235b",
+  "status": "ok",
+  "median_logprob_correct": -0.000502607043927128,
+  "median_logprob_incorrect": -0.0013236268355285574,
+  "overlap_fraction": 0.3971665852467025,
+  "sentence": "39.7% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 2464,
+  "n_incorrect_caption": 2047
+}

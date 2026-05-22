@@ -1,0 +1,11 @@
+{
+  "dataset": "floodnet",
+  "model": "pixtral",
+  "status": "ok",
+  "median_logprob_correct": -0.2778501929715276,
+  "median_logprob_incorrect": -0.2288540159060517,
+  "overlap_fraction": 0.6670422535211268,
+  "sentence": "66.7% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 961,
+  "n_incorrect_caption": 3550
+}

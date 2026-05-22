@@ -1,0 +1,14 @@
+{
+  "dataset": "vqav2",
+  "model": "pixtral",
+  "oracle_accuracy": 87.31980405878237,
+  "oracle_avg_cost": 30.46799626778633,
+  "fraction_unsolvable": 0.1268019594121763,
+  "fidelity_distribution": {
+    "full": 0.153254,
+    "jpeg_q1": 0.151714,
+    "caption": 0.495218,
+    "resize_32x32": 0.130814,
+    "jpeg_q10": 0.068999
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "dataset": "gqa",
+  "model": "pixtral",
+  "oracle_accuracy": 84.82509282782881,
+  "oracle_avg_cost": 32.338105009445634,
+  "fraction_unsolvable": 0.15174907172171193,
+  "fidelity_distribution": {
+    "jpeg_q1": 0.159859,
+    "caption": 0.421341,
+    "full": 0.173735,
+    "jpeg_q10": 0.053058,
+    "resize_32x32": 0.192007
+  }
+}

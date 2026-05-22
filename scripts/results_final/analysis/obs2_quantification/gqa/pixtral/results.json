@@ -1,0 +1,11 @@
+{
+  "dataset": "gqa",
+  "model": "pixtral",
+  "status": "ok",
+  "median_logprob_correct": -0.18727083876729012,
+  "median_logprob_incorrect": -0.1939997302233678,
+  "overlap_fraction": 0.4696048632218845,
+  "sentence": "47.0% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 4312,
+  "n_incorrect_caption": 5922
+}

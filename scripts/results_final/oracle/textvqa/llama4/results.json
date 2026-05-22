@@ -1,0 +1,14 @@
+{
+  "dataset": "textvqa",
+  "model": "llama4",
+  "oracle_accuracy": 98.07407407407408,
+  "oracle_avg_cost": 17.730703703703707,
+  "fraction_unsolvable": 0.01925925925925931,
+  "fidelity_distribution": {
+    "caption": 0.759407,
+    "resize_32x32": 0.038667,
+    "jpeg_q1": 0.09037,
+    "full": 0.043407,
+    "jpeg_q10": 0.068148
+  }
+}

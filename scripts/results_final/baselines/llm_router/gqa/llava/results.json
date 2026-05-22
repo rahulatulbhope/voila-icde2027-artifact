@@ -1,0 +1,34 @@
+{
+  "dataset": "gqa",
+  "model": "llava",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "status": "ok",
+  "router_kind": "azure_gpt4o",
+  "routing": "ternary",
+  "n_samples": 10234,
+  "label_distribution": {
+    "low": 0.305257,
+    "medium": 0.668751,
+    "high": 0.025992
+  },
+  "accuracy": 68.73167871799882,
+  "avg_cost": 40.52504722819361,
+  "cost_reduction_pct": 59.474952771806386,
+  "fidelity_distribution": {
+    "caption": 0.305257,
+    "jpeg_q10": 0.668751,
+    "full": 0.025992
+  },
+  "n_errors": 0,
+  "errors_sample": [],
+  "cache_dir": "/home/rbhope/VOILA_code/results/cache/llm_router",
+  "dataset_label_store": "/home/rbhope/VOILA_code/results/cache/llm_router/datasets/gqa_ternary_nall_seed42.json",
+  "n_dataset_labels": 10233,
+  "n_missing_labels_for_model": -1
+}

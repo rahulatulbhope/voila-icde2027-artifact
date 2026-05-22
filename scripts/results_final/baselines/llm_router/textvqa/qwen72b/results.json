@@ -1,0 +1,34 @@
+{
+  "dataset": "textvqa",
+  "model": "qwen72b",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "status": "ok",
+  "router_kind": "azure_gpt4o",
+  "routing": "ternary",
+  "n_samples": 9100,
+  "label_distribution": {
+    "medium": 0.284505,
+    "high": 0.545275,
+    "low": 0.17022
+  },
+  "accuracy": 92.96703296703296,
+  "avg_cost": 70.96822344322345,
+  "cost_reduction_pct": 29.03177655677655,
+  "fidelity_distribution": {
+    "jpeg_q10": 0.284505,
+    "full": 0.545275,
+    "caption": 0.17022
+  },
+  "n_errors": 0,
+  "errors_sample": [],
+  "cache_dir": "/home/rbhope/VOILA_code/results/cache/llm_router",
+  "dataset_label_store": "/home/rbhope/VOILA_code/results/cache/llm_router/datasets/textvqa_ternary_nall_seed42.json",
+  "n_dataset_labels": 9100,
+  "n_missing_labels_for_model": 0
+}

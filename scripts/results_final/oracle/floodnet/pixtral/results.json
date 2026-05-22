@@ -1,0 +1,14 @@
+{
+  "dataset": "floodnet",
+  "model": "pixtral",
+  "oracle_accuracy": 77.12258922633562,
+  "oracle_avg_cost": 47.78197738860563,
+  "fraction_unsolvable": 0.22877410773664375,
+  "fidelity_distribution": {
+    "caption": 0.213035,
+    "jpeg_q10": 0.171359,
+    "full": 0.284638,
+    "resize_32x32": 0.173354,
+    "jpeg_q1": 0.157615
+  }
+}

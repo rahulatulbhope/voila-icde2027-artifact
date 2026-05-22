@@ -1,0 +1,14 @@
+{
+  "dataset": "locomo",
+  "model": "qwen7b",
+  "oracle_accuracy": 85.37444933920705,
+  "oracle_avg_cost": 37.049339207048455,
+  "fraction_unsolvable": 0.14625550660792952,
+  "fidelity_distribution": {
+    "jpeg_q10": 0.092952,
+    "caption": 0.267841,
+    "full": 0.184141,
+    "jpeg_q1": 0.210573,
+    "resize_32x32": 0.244493
+  }
+}

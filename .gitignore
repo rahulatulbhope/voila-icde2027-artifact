@@ -1,0 +1,40 @@
+# Secrets
+.env
+.env.*
+secrets/*
+!secrets/README.md
+
+# Python/cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Large offline datasets and generated model/checkpoint artifacts
+files/
+model_artifacts/
+scripts/model_artifacts/
+*.joblib
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.onnx
+
+# Runtime caches and throwaway result snapshots
+results/
+results/cache/
+results_cost100/
+results_llm_router_test/
+results_old/
+results_old_1/
+results_old_2/
+scripts/results_final - Copy/
+scripts/results_final_smoke_additional/
+
+# Local archives or synced cloud bundles
+*.zip
+*.tar
+*.tar.gz
+*.7z

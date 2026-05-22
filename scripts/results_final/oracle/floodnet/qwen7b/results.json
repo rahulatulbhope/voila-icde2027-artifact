@@ -1,0 +1,14 @@
+{
+  "dataset": "floodnet",
+  "model": "qwen7b",
+  "oracle_accuracy": 78.51917534914654,
+  "oracle_avg_cost": 39.363093918569426,
+  "fraction_unsolvable": 0.2148082465085347,
+  "fidelity_distribution": {
+    "full": 0.267568,
+    "caption": 0.352915,
+    "jpeg_q1": 0.063622,
+    "jpeg_q10": 0.072268,
+    "resize_32x32": 0.243627
+  }
+}

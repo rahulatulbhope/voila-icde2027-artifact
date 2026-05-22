@@ -1,0 +1,11 @@
+{
+  "dataset": "vqav2",
+  "model": "qwen235b",
+  "status": "ok",
+  "median_logprob_correct": -0.0067467377518681815,
+  "median_logprob_incorrect": -0.031856733797910514,
+  "overlap_fraction": 0.2903118779031188,
+  "sentence": "29.0% of incorrect caption-fidelity answers have log-probability above the median confidence of correct caption-fidelity answers.",
+  "n_correct_caption": 12346,
+  "n_incorrect_caption": 9042
+}

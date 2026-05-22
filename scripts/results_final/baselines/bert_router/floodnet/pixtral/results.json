@@ -1,0 +1,107 @@
+{
+  "dataset": "floodnet",
+  "model": "pixtral",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "accuracy_mean": 49.05785838287257,
+  "accuracy_std": 0.8747082086544378,
+  "avg_cost_mean": 50.86756923828676,
+  "avg_cost_std": 0.5054325658927031,
+  "cost_reduction_pct_mean": 49.13243076171324,
+  "cost_reduction_pct_std": 0.5054325658927031,
+  "fidelity_distribution": {
+    "caption": 0.197955,
+    "full": 0.294613,
+    "jpeg_q10": 0.320996,
+    "resize_32x32": 0.186436
+  },
+  "lambda_values": [
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN
+  ],
+  "tau_values": [
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN
+  ],
+  "folds": [
+    {
+      "fold": 1,
+      "n_test": 903,
+      "accuracy": 0.49058693244739754,
+      "avg_cost": 50.26273532668881,
+      "cost_reduction_pct": 49.73726467331119,
+      "fidelity_distribution": {
+        "resize_32x32": 0.172757,
+        "full": 0.294574,
+        "jpeg_q10": 0.310078,
+        "caption": 0.222591
+      }
+    },
+    {
+      "fold": 2,
+      "n_test": 902,
+      "accuracy": 0.4844789356984479,
+      "avg_cost": 51.3670546932742,
+      "cost_reduction_pct": 48.6329453067258,
+      "fidelity_distribution": {
+        "jpeg_q10": 0.324834,
+        "caption": 0.191796,
+        "full": 0.298226,
+        "resize_32x32": 0.185144
+      }
+    },
+    {
+      "fold": 3,
+      "n_test": 902,
+      "accuracy": 0.4878048780487805,
+      "avg_cost": 50.878510716925355,
+      "cost_reduction_pct": 49.121489283074645,
+      "fidelity_distribution": {
+        "jpeg_q10": 0.327051,
+        "full": 0.291574,
+        "resize_32x32": 0.18847,
+        "caption": 0.192905
+      }
+    },
+    {
+      "fold": 4,
+      "n_test": 902,
+      "accuracy": 0.4844789356984479,
+      "avg_cost": 50.46646341463415,
+      "cost_reduction_pct": 49.53353658536585,
+      "fidelity_distribution": {
+        "full": 0.300443,
+        "jpeg_q10": 0.300443,
+        "resize_32x32": 0.186253,
+        "caption": 0.21286
+      }
+    },
+    {
+      "fold": 5,
+      "n_test": 902,
+      "accuracy": 0.5055432372505543,
+      "avg_cost": 51.363082039911305,
+      "cost_reduction_pct": 48.636917960088695,
+      "fidelity_distribution": {
+        "full": 0.288248,
+        "caption": 0.169623,
+        "resize_32x32": 0.199557,
+        "jpeg_q10": 0.342572
+      }
+    }
+  ],
+  "router_kind": "supervised_fidelity_classifier",
+  "feature_set": "bert",
+  "target_label": "cheapest_sufficient_fidelity_else_full"
+}

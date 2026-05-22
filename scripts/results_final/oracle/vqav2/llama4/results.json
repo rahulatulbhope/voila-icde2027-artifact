@@ -1,0 +1,14 @@
+{
+  "dataset": "vqav2",
+  "model": "llama4",
+  "oracle_accuracy": 82.42127361791462,
+  "oracle_avg_cost": 34.2612238550657,
+  "fraction_unsolvable": 0.17578726382085375,
+  "fidelity_distribution": {
+    "full": 0.206951,
+    "jpeg_q10": 0.076697,
+    "caption": 0.45617,
+    "resize_32x32": 0.16795,
+    "jpeg_q1": 0.092232
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "dataset": "floodnet",
+  "model": "qwen72b",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "status": "ok",
+  "router_kind": "azure_gpt4o",
+  "routing": "ternary",
+  "n_samples": 1448,
+  "label_distribution": {
+    "medium": 0.714088,
+    "high": 0.091851,
+    "low": 0.194061
+  },
+  "accuracy": 39.709944751381215,
+  "avg_cost": 48.681917587476974,
+  "cost_reduction_pct": 51.318082412523026,
+  "fidelity_distribution": {
+    "jpeg_q10": 0.714088,
+    "full": 0.091851,
+    "caption": 0.194061
+  },
+  "n_errors": 0,
+  "errors_sample": [],
+  "cache_dir": "/home/rbhope/VOILA_code/results/cache/llm_router",
+  "dataset_label_store": "/home/rbhope/VOILA_code/results/cache/llm_router/datasets/floodnet_ternary_nall_seed42.json",
+  "n_dataset_labels": 4511,
+  "n_missing_labels_for_model": 3063
+}

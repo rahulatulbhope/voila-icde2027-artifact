@@ -1,0 +1,432 @@
+{
+  "accuracy_mean": 66.85934787466269,
+  "accuracy_std": 1.604380474030776,
+  "avg_cost_mean": 12.355549539639158,
+  "avg_cost_std": 4.957247838652657,
+  "cost_reduction_pct_mean": 87.64445046036084,
+  "cost_reduction_pct_std": 4.957247838652661,
+  "fidelity_distribution": {
+    "caption": 0.829978,
+    "full": 0.01041,
+    "jpeg_q1": 0.000443,
+    "jpeg_q10": 0.002215,
+    "resize_32x32": 0.156954
+  },
+  "lambda_values": [
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN
+  ],
+  "tau_values": [
+    NaN,
+    NaN,
+    NaN,
+    NaN,
+    NaN
+  ],
+  "folds": [
+    {
+      "fold": 1,
+      "n_test": 0,
+      "lambda": NaN,
+      "tau": NaN,
+      "accuracy": 0.6434108527131783,
+      "avg_cost": 21.22157622739018,
+      "cost_reduction_pct": 78.77842377260981,
+      "fidelity_distribution": {
+        "caption": 0.799557,
+        "resize_32x32": 0.13732,
+        "full": 0.049834,
+        "jpeg_q10": 0.011074,
+        "jpeg_q1": 0.002215
+      },
+      "calibration": {}
+    },
+    {
+      "fold": 2,
+      "n_test": 0,
+      "lambda": NaN,
+      "tau": NaN,
+      "accuracy": 0.6729490022172949,
+      "avg_cost": 10.091648189209165,
+      "cost_reduction_pct": 89.90835181079083,
+      "fidelity_distribution": {
+        "caption": 0.833703,
+        "resize_32x32": 0.166297
+      },
+      "calibration": {}
+    },
+    {
+      "fold": 3,
+      "n_test": 0,
+      "lambda": NaN,
+      "tau": NaN,
+      "accuracy": 0.6729490022172949,
+      "avg_cost": 10.303492239467845,
+      "cost_reduction_pct": 89.69650776053216,
+      "fidelity_distribution": {
+        "caption": 0.833703,
+        "resize_32x32": 0.165188,
+        "full": 0.001109
+      },
+      "calibration": {}
+    },
+    {
+      "fold": 4,
+      "n_test": 0,
+      "lambda": NaN,
+      "tau": NaN,
+      "accuracy": 0.6662971175166297,
+      "avg_cost": 10.041481892091646,
+      "cost_reduction_pct": 89.95851810790836,
+      "fidelity_distribution": {
+        "caption": 0.837029,
+        "resize_32x32": 0.162971
+      },
+      "calibration": {}
+    },
+    {
+      "fold": 5,
+      "n_test": 0,
+      "lambda": NaN,
+      "tau": NaN,
+      "accuracy": 0.6873614190687362,
+      "avg_cost": 10.119549150036953,
+      "cost_reduction_pct": 89.88045084996304,
+      "fidelity_distribution": {
+        "caption": 0.845898,
+        "resize_32x32": 0.152993,
+        "full": 0.001109
+      },
+      "calibration": {}
+    }
+  ],
+  "threshold_values": [
+    {
+      "caption->resize_32x32": -0.4084216554959615,
+      "resize_32x32->jpeg_q1": -0.6686259234944979,
+      "jpeg_q1->jpeg_q10": -0.2678368277847767,
+      "jpeg_q10->full": -0.4383617766822378
+    },
+    {
+      "caption->resize_32x32": -0.43323149979114534,
+      "resize_32x32->jpeg_q1": -0.995721623301506,
+      "jpeg_q1->jpeg_q10": -0.5643314079691967,
+      "jpeg_q10->full": Infinity
+    },
+    {
+      "caption->resize_32x32": -0.4170988202095032,
+      "resize_32x32->jpeg_q1": -0.995721623301506,
+      "jpeg_q1->jpeg_q10": -0.5643314079691967,
+      "jpeg_q10->full": Infinity
+    },
+    {
+      "caption->resize_32x32": -0.4293243527412415,
+      "resize_32x32->jpeg_q1": -0.995721623301506,
+      "jpeg_q1->jpeg_q10": -0.5643314079691967,
+      "jpeg_q10->full": Infinity
+    },
+    {
+      "caption->resize_32x32": -0.4293243527412415,
+      "resize_32x32->jpeg_q1": -1.0334428027272224,
+      "jpeg_q1->jpeg_q10": Infinity,
+      "jpeg_q10->full": Infinity
+    }
+  ],
+  "threshold_method": "pairwise_max_cdf_separation",
+  "threshold_details": [
+    {
+      "caption->resize_32x32": {
+        "theta": -0.4084216554959615,
+        "separation": 0.2909017865252538,
+        "cdf_correct": 0.0860082304526749,
+        "cdf_incorrect": 0.3769100169779287,
+        "n_correct": 2430,
+        "n_incorrect": 1178,
+        "status": "ok",
+        "edge": "caption->resize_32x32",
+        "current_fidelity": "caption",
+        "next_fidelity": "resize_32x32",
+        "n_reached_edge": 3608,
+        "n_finite_logprob": 3608
+      },
+      "resize_32x32->jpeg_q1": {
+        "theta": -0.6686259234944979,
+        "separation": 0.013804713804713792,
+        "cdf_correct": 0.24545454545454545,
+        "cdf_incorrect": 0.25925925925925924,
+        "n_correct": 220,
+        "n_incorrect": 432,
+        "status": "ok",
+        "edge": "resize_32x32->jpeg_q1",
+        "current_fidelity": "resize_32x32",
+        "next_fidelity": "jpeg_q1",
+        "n_reached_edge": 652,
+        "n_finite_logprob": 652
+      },
+      "jpeg_q1->jpeg_q10": {
+        "theta": -0.2678368277847767,
+        "separation": 0.0,
+        "cdf_correct": 1.0,
+        "cdf_incorrect": 1.0,
+        "n_correct": 47,
+        "n_incorrect": 118,
+        "status": "ok",
+        "edge": "jpeg_q1->jpeg_q10",
+        "current_fidelity": "jpeg_q1",
+        "next_fidelity": "jpeg_q10",
+        "n_reached_edge": 165,
+        "n_finite_logprob": 165
+      },
+      "jpeg_q10->full": {
+        "theta": -0.4383617766822378,
+        "separation": 0.34096824570536177,
+        "cdf_correct": 0.5882352941176471,
+        "cdf_incorrect": 0.9292035398230089,
+        "n_correct": 51,
+        "n_incorrect": 113,
+        "status": "ok",
+        "edge": "jpeg_q10->full",
+        "current_fidelity": "jpeg_q10",
+        "next_fidelity": "full",
+        "n_reached_edge": 164,
+        "n_finite_logprob": 164
+      }
+    },
+    {
+      "caption->resize_32x32": {
+        "theta": -0.43323149979114534,
+        "separation": 0.2793474865682939,
+        "cdf_correct": 0.06606110652353427,
+        "cdf_incorrect": 0.34540859309182814,
+        "n_correct": 2422,
+        "n_incorrect": 1187,
+        "status": "ok",
+        "edge": "caption->resize_32x32",
+        "current_fidelity": "caption",
+        "next_fidelity": "resize_32x32",
+        "n_reached_edge": 3609,
+        "n_finite_logprob": 3609
+      },
+      "resize_32x32->jpeg_q1": {
+        "theta": -0.995721623301506,
+        "separation": 0.008300499898774391,
+        "cdf_correct": 0.006369426751592357,
+        "cdf_incorrect": 0.014669926650366748,
+        "n_correct": 157,
+        "n_incorrect": 409,
+        "status": "ok",
+        "edge": "resize_32x32->jpeg_q1",
+        "current_fidelity": "resize_32x32",
+        "next_fidelity": "jpeg_q1",
+        "n_reached_edge": 566,
+        "n_finite_logprob": 566
+      },
+      "jpeg_q1->jpeg_q10": {
+        "theta": -0.5643314079691967,
+        "separation": 0.8,
+        "cdf_correct": 0.0,
+        "cdf_incorrect": 0.8,
+        "n_correct": 1,
+        "n_incorrect": 5,
+        "status": "ok",
+        "edge": "jpeg_q1->jpeg_q10",
+        "current_fidelity": "jpeg_q1",
+        "next_fidelity": "jpeg_q10",
+        "n_reached_edge": 6,
+        "n_finite_logprob": 6
+      },
+      "jpeg_q10->full": {
+        "theta": Infinity,
+        "separation": 0.0,
+        "n_correct": 0,
+        "n_incorrect": 3,
+        "status": "fallback_all_incorrect_escalate",
+        "edge": "jpeg_q10->full",
+        "current_fidelity": "jpeg_q10",
+        "next_fidelity": "full",
+        "n_reached_edge": 3,
+        "n_finite_logprob": 3
+      }
+    },
+    {
+      "caption->resize_32x32": {
+        "theta": -0.4170988202095032,
+        "separation": 0.2834497949368705,
+        "cdf_correct": 0.08316094331816301,
+        "cdf_incorrect": 0.36661073825503354,
+        "n_correct": 2417,
+        "n_incorrect": 1192,
+        "status": "ok",
+        "edge": "caption->resize_32x32",
+        "current_fidelity": "caption",
+        "next_fidelity": "resize_32x32",
+        "n_reached_edge": 3609,
+        "n_finite_logprob": 3609
+      },
+      "resize_32x32->jpeg_q1": {
+        "theta": -0.995721623301506,
+        "separation": 0.006796989102348051,
+        "cdf_correct": 0.004830917874396135,
+        "cdf_incorrect": 0.011627906976744186,
+        "n_correct": 207,
+        "n_incorrect": 430,
+        "status": "ok",
+        "edge": "resize_32x32->jpeg_q1",
+        "current_fidelity": "resize_32x32",
+        "next_fidelity": "jpeg_q1",
+        "n_reached_edge": 637,
+        "n_finite_logprob": 637
+      },
+      "jpeg_q1->jpeg_q10": {
+        "theta": -0.5643314079691967,
+        "separation": 0.75,
+        "cdf_correct": 0.0,
+        "cdf_incorrect": 0.75,
+        "n_correct": 1,
+        "n_incorrect": 4,
+        "status": "ok",
+        "edge": "jpeg_q1->jpeg_q10",
+        "current_fidelity": "jpeg_q1",
+        "next_fidelity": "jpeg_q10",
+        "n_reached_edge": 5,
+        "n_finite_logprob": 5
+      },
+      "jpeg_q10->full": {
+        "theta": Infinity,
+        "separation": 0.0,
+        "n_correct": 0,
+        "n_incorrect": 2,
+        "status": "fallback_all_incorrect_escalate",
+        "edge": "jpeg_q10->full",
+        "current_fidelity": "jpeg_q10",
+        "next_fidelity": "full",
+        "n_reached_edge": 2,
+        "n_finite_logprob": 2
+      }
+    },
+    {
+      "caption->resize_32x32": {
+        "theta": -0.4293243527412415,
+        "separation": 0.2900191506139461,
+        "cdf_correct": 0.06856670797191243,
+        "cdf_incorrect": 0.35858585858585856,
+        "n_correct": 2421,
+        "n_incorrect": 1188,
+        "status": "ok",
+        "edge": "caption->resize_32x32",
+        "current_fidelity": "caption",
+        "next_fidelity": "resize_32x32",
+        "n_reached_edge": 3609,
+        "n_finite_logprob": 3609
+      },
+      "resize_32x32->jpeg_q1": {
+        "theta": -0.995721623301506,
+        "separation": 0.008437761069340017,
+        "cdf_correct": 0.005847953216374269,
+        "cdf_incorrect": 0.014285714285714285,
+        "n_correct": 171,
+        "n_incorrect": 420,
+        "status": "ok",
+        "edge": "resize_32x32->jpeg_q1",
+        "current_fidelity": "resize_32x32",
+        "next_fidelity": "jpeg_q1",
+        "n_reached_edge": 591,
+        "n_finite_logprob": 591
+      },
+      "jpeg_q1->jpeg_q10": {
+        "theta": -0.5643314079691967,
+        "separation": 0.8,
+        "cdf_correct": 0.0,
+        "cdf_incorrect": 0.8,
+        "n_correct": 1,
+        "n_incorrect": 5,
+        "status": "ok",
+        "edge": "jpeg_q1->jpeg_q10",
+        "current_fidelity": "jpeg_q1",
+        "next_fidelity": "jpeg_q10",
+        "n_reached_edge": 6,
+        "n_finite_logprob": 6
+      },
+      "jpeg_q10->full": {
+        "theta": Infinity,
+        "separation": 0.0,
+        "n_correct": 0,
+        "n_incorrect": 3,
+        "status": "fallback_all_incorrect_escalate",
+        "edge": "jpeg_q10->full",
+        "current_fidelity": "jpeg_q10",
+        "next_fidelity": "full",
+        "n_reached_edge": 3,
+        "n_finite_logprob": 3
+      }
+    },
+    {
+      "caption->resize_32x32": {
+        "theta": -0.4293243527412415,
+        "separation": 0.28423600327537046,
+        "cdf_correct": 0.07119067443796837,
+        "cdf_incorrect": 0.35542667771333886,
+        "n_correct": 2402,
+        "n_incorrect": 1207,
+        "status": "ok",
+        "edge": "caption->resize_32x32",
+        "current_fidelity": "caption",
+        "next_fidelity": "resize_32x32",
+        "n_reached_edge": 3609,
+        "n_finite_logprob": 3609
+      },
+      "resize_32x32->jpeg_q1": {
+        "theta": -1.0334428027272224,
+        "separation": 0.004728132387706856,
+        "cdf_correct": 0.0,
+        "cdf_incorrect": 0.004728132387706856,
+        "n_correct": 176,
+        "n_incorrect": 423,
+        "status": "ok",
+        "edge": "resize_32x32->jpeg_q1",
+        "current_fidelity": "resize_32x32",
+        "next_fidelity": "jpeg_q1",
+        "n_reached_edge": 599,
+        "n_finite_logprob": 599
+      },
+      "jpeg_q1->jpeg_q10": {
+        "theta": Infinity,
+        "separation": 0.0,
+        "n_correct": 0,
+        "n_incorrect": 1,
+        "status": "fallback_all_incorrect_escalate",
+        "edge": "jpeg_q1->jpeg_q10",
+        "current_fidelity": "jpeg_q1",
+        "next_fidelity": "jpeg_q10",
+        "n_reached_edge": 1,
+        "n_finite_logprob": 1
+      },
+      "jpeg_q10->full": {
+        "theta": Infinity,
+        "separation": 0.0,
+        "n_correct": 0,
+        "n_incorrect": 1,
+        "status": "fallback_all_incorrect_escalate",
+        "edge": "jpeg_q10->full",
+        "current_fidelity": "jpeg_q10",
+        "next_fidelity": "full",
+        "n_reached_edge": 1,
+        "n_finite_logprob": 1
+      }
+    }
+  ],
+  "dataset": "floodnet",
+  "model": "llava",
+  "costs": {
+    "caption": 7.583333333333333,
+    "resize_32x32": 15.083333333333332,
+    "jpeg_q1": 37.833333333333336,
+    "jpeg_q10": 53.25,
+    "full": 100.0
+  },
+  "cost_accounting": "cumulative_sum_of_all_fidelities_reached",
+  "max_possible_cascade_cost": 213.75
+}
