@@ -40,3 +40,7 @@ scripts/results_final_smoke_additional/
 *.tar
 *.tar.gz
 *.7z
+
+# Third-party replay tools and downloaded raw imagery
+external/
+raw_data/

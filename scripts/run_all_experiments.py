@@ -29,6 +29,7 @@ import math
 import os
 import re
 import string
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -71,7 +72,7 @@ from sklearn.isotonic import IsotonicRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.metrics import brier_score_loss
-from sklearn.model_selection import KFold, train_test_split
+from sklearn.model_selection import GroupKFold, KFold, train_test_split
 from sklearn.neural_network import MLPRegressor
 
 try:
@@ -244,6 +245,8 @@ DATASET_CONFIGS = {
 
 EXPERIMENTS = [
     "main",
+    "floodnet_stress",
+    "vocab_audit",
     "voila_cdf",
     "cascade",
     "llm_router",
@@ -259,10 +262,22 @@ EXPERIMENTS = [
     "tables",
 ]
 
+PERCOM_OFFLINE_EXPERIMENTS = [
+    "main",
+    "floodnet_stress",
+    "vocab_audit",
+    "oracle",
+    "ablation_calibration",
+    "obs2_quant",
+    "tables",
+]
+
 PAIRWISE_EXPERIMENTS = {
     "oracle",
     "obs2_quant",
     "main",
+    "floodnet_stress",
+    "vocab_audit",
     "voila_cdf",
     "cascade",
     "llm_router",
@@ -326,6 +341,51 @@ class TemperatureCalibrator:
         return expit(logit(scores) / self.temperature)
 
 
+class SharedSlopePlattModel:
+    """One logistic slope shared by fidelities, with one intercept per fidelity."""
+
+    def __init__(self, fidelities: Sequence[str]):
+        self.fidelities = list(fidelities)
+        self.model = LogisticRegression(C=1e6, max_iter=2000, solver="lbfgs")
+
+    def _design(self, scores, fidelity):
+        scores = np.asarray(scores, dtype=np.float64).reshape(-1, 1)
+        offsets = np.zeros((len(scores), len(self.fidelities)), dtype=np.float64)
+        offsets[:, self.fidelities.index(fidelity)] = 1.0
+        return np.hstack([scores, offsets])
+
+    def fit(self, scores_by_fidelity, labels_by_fidelity):
+        x = np.vstack([self._design(scores_by_fidelity[f], f) for f in self.fidelities])
+        y = np.concatenate([np.asarray(labels_by_fidelity[f], dtype=int) for f in self.fidelities])
+        if len(np.unique(y)) < 2:
+            self.model = ConstantModel(float(np.mean(y)))
+            self._constant = True
+        else:
+            self.model.fit(x, y)
+            self._constant = False
+        return self
+
+    def transform(self, scores, fidelity):
+        x = self._design(scores, fidelity)
+        if getattr(self, "_constant", False):
+            return self.model.predict(x)
+        return self.model.predict_proba(x)[:, 1]
+
+
+class SharedSlopePlattView:
+    """Fidelity-specific serializable view over a shared Platt model."""
+
+    def __init__(self, shared_model, fidelity):
+        self.shared_model = shared_model
+        self.fidelity = fidelity
+
+    def fit(self, scores, labels):
+        return self
+
+    def transform(self, scores):
+        return self.shared_model.transform(scores, self.fidelity)
+
+
 @dataclass
 class TrainedFidelityModel:
     model: Any
@@ -333,6 +393,20 @@ class TrainedFidelityModel:
     y_cal: np.ndarray
     p_cal: np.ndarray
     p_test: Optional[np.ndarray] = None
+
+
+# Keep serialized artifacts importable when this file is first run as a script
+# and later loaded by a separate benchmark or application process.
+sys.modules.setdefault("run_all_experiments", sys.modules[__name__])
+for _artifact_class in (
+    ConstantModel,
+    NoCalibrator,
+    TemperatureCalibrator,
+    SharedSlopePlattModel,
+    SharedSlopePlattView,
+    TrainedFidelityModel,
+):
+    _artifact_class.__module__ = "run_all_experiments"
 
 
 def clean_text(text):
@@ -483,7 +557,7 @@ def resolve_fidelity_specs(columns: Sequence[str], cfg: Dict[str, Any]):
     return specs
 
 
-def load_dataset(dataset, model, data_dir, max_rows=None, seed=42):
+def load_dataset(dataset, model, data_dir, max_rows=None, seed=42, common_keys_csv=None):
     rel = MODEL_CSV_MAP.get(dataset, {}).get(model)
     if rel is None:
         raise FileNotFoundError(f"No CSV configured for dataset={dataset}, model={model}")
@@ -491,6 +565,28 @@ def load_dataset(dataset, model, data_dir, max_rows=None, seed=42):
     if not path.exists():
         raise FileNotFoundError(str(path))
     df = pd.read_csv(path, low_memory=False)
+    source_duplicate_rows = 0
+    if common_keys_csv:
+        common = pd.read_csv(common_keys_csv, low_memory=False)
+        keys = [key for key in ("image_id", "question") if key in df and key in common]
+        if len(keys) != 2:
+            raise ValueError("Common-population filtering requires image_id and question columns")
+        for key in keys:
+            df[key] = df[key].astype(str)
+            common[key] = common[key].astype(str)
+        if common.duplicated(keys).any():
+            raise ValueError("Common-population file contains duplicate image/question keys")
+        df = df.merge(common[keys], on=keys, how="inner", validate="many_to_one")
+        source_duplicate_rows = int(df.duplicated(keys, keep=False).sum())
+        if source_duplicate_rows:
+            duplicates = df[df.duplicated(keys, keep=False)]
+            compare_columns = [column for column in df.columns if column not in keys + ["question_id"]]
+            conflicting = duplicates.groupby(keys, dropna=False)[compare_columns].nunique(dropna=False).gt(1).any(axis=1)
+            if conflicting.any():
+                raise ValueError(
+                    f"Found {int(conflicting.sum())} conflicting duplicate image/question pairs in {path}"
+                )
+            df = df.drop_duplicates(keys, keep="first")
     if max_rows is not None and len(df) > max_rows:
         df = df.sample(n=max_rows, random_state=seed).sort_index().reset_index(drop=True)
     cfg = dict(DATASET_CONFIGS[dataset])
@@ -501,6 +597,7 @@ def load_dataset(dataset, model, data_dir, max_rows=None, seed=42):
     if not specs:
         raise ValueError(f"No usable fidelity columns in {path}")
     df = compute_correctness(df, specs, cfg)
+    df.attrs["source_duplicate_image_question_rows"] = source_duplicate_rows
     return df, cfg, specs, path
 
 
@@ -675,6 +772,9 @@ def train_fidelity_models(
     cal_pred = pd.DataFrame(index=cal_df.index)
     test_pred = pd.DataFrame(index=test_df.index)
 
+    raw_by_fidelity = {}
+    labels_by_fidelity = {}
+    models_by_fidelity = {}
     for spec in specs:
         corr_col = f"correct_{spec.fidelity}"
         if corr_col not in train_df.columns or corr_col not in cal_df.columns:
@@ -687,13 +787,36 @@ def train_fidelity_models(
             model = clone(build_predictor(predictor_name, seed))
             model.fit(x_train, y_train)
 
-        raw_cal = raw_predict(model, x_cal)
-        calibrator = build_calibrator(calibration)
-        if calibration == "iso" and len(np.unique(y_cal)) < 2:
-            calibrator = NoCalibrator()
-        calibrator.fit(raw_cal, y_cal)
+        models_by_fidelity[spec.fidelity] = model
+        labels_by_fidelity[spec.fidelity] = y_cal
+        raw_by_fidelity[spec.fidelity] = {
+            "cal": raw_predict(model, x_cal),
+            "test": raw_predict(model, x_test),
+        }
+
+    shared_calibrator = None
+    if calibration == "shared_platt":
+        shared_calibrator = SharedSlopePlattModel(list(raw_by_fidelity))
+        shared_calibrator.fit(
+            {f: values["cal"] for f, values in raw_by_fidelity.items()},
+            labels_by_fidelity,
+        )
+
+    for spec in specs:
+        if spec.fidelity not in raw_by_fidelity:
+            continue
+        model = models_by_fidelity[spec.fidelity]
+        y_cal = labels_by_fidelity[spec.fidelity]
+        raw_cal = raw_by_fidelity[spec.fidelity]["cal"]
+        raw_test = raw_by_fidelity[spec.fidelity]["test"]
+        if shared_calibrator is not None:
+            calibrator = SharedSlopePlattView(shared_calibrator, spec.fidelity)
+        else:
+            calibrator = build_calibrator(calibration)
+            if calibration == "iso" and len(np.unique(y_cal)) < 2:
+                calibrator = NoCalibrator()
+            calibrator.fit(raw_cal, y_cal)
         p_cal = np.clip(calibrator.transform(raw_cal), 0.0, 1.0)
-        raw_test = raw_predict(model, x_test)
         p_test = np.clip(calibrator.transform(raw_test), 0.0, 1.0)
         cal_pred[f"p_{spec.fidelity}"] = p_cal
         test_pred[f"p_{spec.fidelity}"] = p_test
@@ -756,7 +879,8 @@ def missing_artifact_error(path):
     )
 
 
-def select_voi(pred_df, specs, costs, lam, tau):
+def select_legacy_sequential(pred_df, specs, costs, lam, tau=0.0):
+    """Historical sequential rule retained only for reproducibility ablations."""
     ordered = [s.fidelity for s in specs if f"p_{s.fidelity}" in pred_df.columns]
     ordered = sorted(ordered, key=lambda f: costs[f])
     selected = np.array([ordered[0]] * len(pred_df), dtype=object)
@@ -768,6 +892,32 @@ def select_voi(pred_df, specs, costs, lam, tau):
         selected[escalate] = next_f
         current_p[escalate] = next_p[escalate]
     return selected
+
+
+def select_voi(pred_df, specs, costs, lam, tau=None):
+    """Exact global argmax of calibrated correctness minus acquisition cost.
+
+    The optional ``tau`` parameter is ignored and retained solely so older
+    callers fail safe while result files migrate away from the old interface.
+    Columns with missing predictions are unavailable.  Stable cost ordering
+    makes ties select the cheaper fidelity.
+    """
+    ordered = [s.fidelity for s in specs if f"p_{s.fidelity}" in pred_df.columns]
+    ordered = sorted(ordered, key=lambda f: (costs[f], f))
+    if not ordered:
+        raise ValueError("No fidelity probability columns are available")
+    utility = np.column_stack(
+        [
+            pred_df[f"p_{f}"].astype(float).fillna(-np.inf).to_numpy()
+            - float(lam) * float(costs[f])
+            for f in ordered
+        ]
+    )
+    if np.any(np.all(~np.isfinite(utility), axis=1)):
+        raise ValueError("At least one query has no finite fidelity prediction")
+    row_max = np.max(utility, axis=1, keepdims=True)
+    tied_for_best = np.isclose(utility, row_max, atol=1e-12, rtol=0.0)
+    return np.asarray(ordered, dtype=object)[np.argmax(tied_for_best, axis=1)]
 
 
 def select_voila_cdf(pred_df, specs, costs, thresholds, lambda_cost):
@@ -829,7 +979,94 @@ def calibration_quality(df, pred_df, specs):
             "brier": float(brier_score_loss(y, p)),
             "ece": float(expected_calibration_error(y, p)),
         }
+    pairwise_errors = []
+    available = [s for s in specs if f"p_{s.fidelity}" in pred_df and f"correct_{s.fidelity}" in df]
+    for left_idx, left in enumerate(available):
+        for right in available[left_idx + 1:]:
+            predicted_gain = (
+                pred_df[f"p_{right.fidelity}"].to_numpy(dtype=float)
+                - pred_df[f"p_{left.fidelity}"].to_numpy(dtype=float)
+            )
+            observed_gain = (
+                df[f"correct_{right.fidelity}"].to_numpy(dtype=float)
+                - df[f"correct_{left.fidelity}"].to_numpy(dtype=float)
+            )
+            pairwise_errors.extend(np.abs(predicted_gain - observed_gain).tolist())
+    rows["_decision"] = {
+        "pairwise_gain_mae": float(np.mean(pairwise_errors)) if pairwise_errors else None,
+    }
     return rows
+
+
+def selection_regret(df, selected, specs, costs, lam):
+    """Mean realized utility regret against the cached per-query oracle."""
+    realized = np.column_stack(
+        [
+            df[f"correct_{s.fidelity}"].to_numpy(dtype=float) - float(lam) * float(costs[s.fidelity])
+            for s in specs
+            if f"correct_{s.fidelity}" in df
+        ]
+    )
+    selected_utility = np.asarray(
+        [float(df.iloc[i][f"correct_{f}"]) - float(lam) * float(costs[f]) for i, f in enumerate(selected)]
+    )
+    return float(np.mean(np.max(realized, axis=1) - selected_utility))
+
+
+def query_level_records(df, pred_df, selected, specs, costs, lam, fold, group_col, cfg):
+    records = []
+    for pos, (_, row) in enumerate(df.iterrows()):
+        chosen = str(selected[pos])
+        record = {
+            "fold": int(fold),
+            "cluster_id": str(row[group_col]),
+            "question_id": str(row[cfg["qid"]]),
+            "image_id": str(row["image_id"]) if "image_id" in row else None,
+            "question": str(row[cfg["question"]]),
+            "lambda": float(lam) if np.isfinite(lam) else None,
+            "selected_fidelity": chosen,
+            "selected_cost": float(costs[chosen]),
+            "selected_correct": bool(row[f"correct_{chosen}"]),
+        }
+        for spec in specs:
+            f = spec.fidelity
+            p_col = f"p_{f}"
+            if p_col not in pred_df:
+                continue
+            probability = float(pred_df.iloc[pos][p_col])
+            record[f"p_{f}"] = probability
+            record[f"utility_{f}"] = probability - float(lam) * float(costs[f])
+            record[f"cost_{f}"] = float(costs[f])
+            record[f"correct_{f}"] = bool(row[f"correct_{f}"])
+        records.append(record)
+    return records
+
+
+def clustered_bootstrap_ci(records, n_boot=1000, seed=42):
+    """Cluster bootstrap CIs for accuracy and mean selected cost."""
+    if not records:
+        return {}
+    frame = pd.DataFrame(records)
+    grouped = frame.groupby("cluster_id", sort=False).agg(
+        n=("selected_correct", "size"),
+        correct=("selected_correct", "sum"),
+        cost=("selected_cost", "sum"),
+    )
+    rng = np.random.default_rng(seed)
+    accuracy = np.empty(n_boot, dtype=float)
+    mean_cost = np.empty(n_boot, dtype=float)
+    values = grouped[["n", "correct", "cost"]].to_numpy(dtype=float)
+    for idx in range(n_boot):
+        sample = values[rng.integers(0, len(values), size=len(values))]
+        total_n = sample[:, 0].sum()
+        accuracy[idx] = sample[:, 1].sum() / total_n
+        mean_cost[idx] = sample[:, 2].sum() / total_n
+    return {
+        "n_clusters": int(len(grouped)),
+        "n_boot": int(n_boot),
+        "accuracy_95ci": [float(x) for x in np.quantile(accuracy, [0.025, 0.975])],
+        "avg_cost_95ci": [float(x) for x in np.quantile(mean_cost, [0.025, 0.975])],
+    }
 
 
 def expected_calibration_error(y, p, n_bins=10):
@@ -897,34 +1134,60 @@ def tune_lam_tau(
     tau_grid,
     tradeoff_mode="pareto_knee",
     cost_weight=0.5,
+    accuracy_retention=0.95,
 ):
+    """Tune the exact utility policy on calibration data only.
+
+    The primary operating point is the cheapest lambda whose accuracy reaches
+    ``accuracy_retention`` times the best fixed-fidelity accuracy.  ``tau_grid``
+    and the older tradeoff parameters remain in the signature for CLI/result
+    compatibility but no longer affect primary selection.
+    """
     candidates = []
     for lam in lambda_grid:
-        for tau in tau_grid:
-            selected = select_voi(cal_pred, specs, costs, lam, tau)
-            metrics = evaluate_selection(cal_df, selected, specs, costs)
-            candidates.append(
-                {
-                    "lambda": lam,
-                    "tau": tau,
-                    "accuracy": metrics["accuracy"],
-                    "avg_cost": metrics["avg_cost"],
-                    "cost_reduction_pct": metrics["cost_reduction_pct"],
-                    "full_cost": costs["full"],
-                }
-            )
-    best = select_tradeoff_candidate(candidates, tradeoff_mode, cost_weight)
+        selected = select_voi(cal_pred, specs, costs, lam)
+        metrics = evaluate_selection(cal_df, selected, specs, costs)
+        regret = selection_regret(cal_df, selected, specs, costs, lam)
+        candidates.append(
+            {
+                "lambda": float(lam),
+                "tau": None,
+                "accuracy": metrics["accuracy"],
+                "avg_cost": metrics["avg_cost"],
+                "cost_reduction_pct": metrics["cost_reduction_pct"],
+                "full_cost": costs["full"],
+                "selection_regret": regret,
+            }
+        )
+    fixed_accuracy = {
+        spec.fidelity: float(cal_df[f"correct_{spec.fidelity}"].mean())
+        for spec in specs
+        if f"correct_{spec.fidelity}" in cal_df.columns
+    }
+    best_fixed_accuracy = max(fixed_accuracy.values())
+    accuracy_floor = float(accuracy_retention) * best_fixed_accuracy
+    feasible = [c for c in candidates if c["accuracy"] + 1e-12 >= accuracy_floor]
+    if feasible:
+        best = min(feasible, key=lambda c: (c["avg_cost"], -c["accuracy"], c["lambda"]))
+        selection_status = "accuracy_floor_met"
+    else:
+        best = max(candidates, key=lambda c: (c["accuracy"], -c["avg_cost"], -c["lambda"]))
+        selection_status = "accuracy_floor_unmet_best_accuracy_used"
     frontier = [c for c in candidates if not is_dominated(c, candidates)]
-    frontier = sorted(frontier, key=lambda c: (-c["accuracy"], c["avg_cost"], c["lambda"], c["tau"]))
+    frontier = sorted(frontier, key=lambda c: (-c["accuracy"], c["avg_cost"], c["lambda"]))
     diagnostics = {
-        "mode": tradeoff_mode,
-        "cost_weight": cost_weight if tradeoff_mode == "accuracy_cost" else None,
+        "mode": "cheapest_at_accuracy_retention",
+        "accuracy_retention": float(accuracy_retention),
+        "best_fixed_validation_accuracy": best_fixed_accuracy,
+        "fixed_validation_accuracy": fixed_accuracy,
+        "accuracy_floor": accuracy_floor,
+        "selection_status": selection_status,
         "selected": {
             "lambda": best["lambda"],
-            "tau": best["tau"],
             "accuracy": best["accuracy"],
             "avg_cost": best["avg_cost"],
             "cost_reduction_pct": best["cost_reduction_pct"],
+            "selection_regret": best["selection_regret"],
         },
         "validation_accuracy": best["accuracy"],
         "validation_avg_cost": best["avg_cost"],
@@ -937,10 +1200,10 @@ def tune_lam_tau(
         "pareto_frontier": [
             {
                 "lambda": c["lambda"],
-                "tau": c["tau"],
                 "accuracy": c["accuracy"],
                 "avg_cost": c["avg_cost"],
                 "cost_reduction_pct": c["cost_reduction_pct"],
+                "selection_regret": c["selection_regret"],
                 "selection_score": c.get("selection_score"),
                 "accuracy_norm": c.get("accuracy_norm"),
                 "saving_norm": c.get("saving_norm"),
@@ -948,7 +1211,28 @@ def tune_lam_tau(
             for c in frontier
         ],
     }
-    return best["lambda"], best["tau"], diagnostics
+    return best["lambda"], None, diagnostics
+
+
+def tune_legacy_lam_tau(cal_df, cal_pred, specs, costs, lambda_grid, tau_grid):
+    """Validation-only tuning for the historical sequential-rule ablation."""
+    candidates = []
+    for lam in lambda_grid:
+        for tau in tau_grid:
+            selected = select_legacy_sequential(cal_pred, specs, costs, lam, tau)
+            metrics = evaluate_selection(cal_df, selected, specs, costs)
+            candidates.append(
+                {
+                    "lambda": float(lam),
+                    "tau": float(tau),
+                    "accuracy": metrics["accuracy"],
+                    "avg_cost": metrics["avg_cost"],
+                    "cost_reduction_pct": metrics["cost_reduction_pct"],
+                    "full_cost": costs["full"],
+                }
+            )
+    best = select_tradeoff_candidate(candidates, "pareto_knee")
+    return best["lambda"], best["tau"], best
 
 
 def learn_voila_cdf_thresholds(cal_df, cal_pred, specs, costs, lambda_cost):
@@ -1059,18 +1343,44 @@ def tune_voila_cdf_thresholds(
     return best["lambda"], best["thresholds"], diagnostics
 
 
+def normalize_question_template(question):
+    return " ".join(clean_text(question).split())
+
+
+def prepare_split_groups(df, cfg, dataset_name=None, split_strategy="auto"):
+    """Return a dataframe and group column used for leakage-safe CV."""
+    out = df.copy()
+    strategy = split_strategy
+    if strategy == "auto":
+        strategy = "image_grouped" if dataset_name == "floodnet" else "question_id"
+    if strategy == "image_grouped":
+        if "image_id" not in out.columns:
+            raise ValueError("image_grouped splitting requires an image_id column")
+        group_col = "image_id"
+    elif strategy == "question_grouped":
+        group_col = "__question_template_group"
+        out[group_col] = out[cfg["question"]].map(normalize_question_template)
+    elif strategy == "question_id":
+        group_col = cfg["qid"]
+    else:
+        raise ValueError(f"Unknown split_strategy={split_strategy}")
+    if out[group_col].isna().any():
+        raise ValueError(f"Split group column {group_col} contains missing values")
+    return out, group_col, strategy
+
+
 def split_by_question_ids(df, qid_col, test_qids):
     return df[df[qid_col].isin(set(test_qids))].copy()
 
 
-def make_outer_splits(df, qid_col, n_folds, seed):
-    qids = pd.Series(df[qid_col].unique())
-    n_splits = min(n_folds, len(qids))
+def make_outer_splits(df, group_col, n_folds, seed):
+    groups = pd.Series(df[group_col].unique())
+    n_splits = min(n_folds, len(groups))
     if n_splits < 2:
-        raise ValueError("Need at least two unique question ids for CV")
+        raise ValueError("Need at least two unique groups for CV")
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
-    for train_idx, test_idx in kf.split(qids):
-        yield qids.iloc[train_idx].values, qids.iloc[test_idx].values
+    for train_idx, test_idx in kf.split(groups):
+        yield groups.iloc[train_idx].values, groups.iloc[test_idx].values
 
 
 def summarize_metric(values):
@@ -1101,21 +1411,39 @@ def run_cv_voila(
     save_models=False,
     reuse_models=False,
     strict_reuse_models=False,
+    split_strategy="auto",
+    accuracy_retention=0.95,
+    bootstrap_samples=1000,
+    return_query_records=False,
 ):
     fold_rows = []
-    qid_col = cfg["qid"]
-    split_iter = list(make_outer_splits(df, qid_col, n_folds, seed))
+    all_query_records = []
+    df, group_col, resolved_split_strategy = prepare_split_groups(
+        df, cfg, dataset_name=dataset_name, split_strategy=split_strategy
+    )
+    split_iter = list(make_outer_splits(df, group_col, n_folds, seed))
     desc = f"{dataset_name}/{model_name} {experiment_name} folds" if dataset_name and model_name else "VOILA folds"
-    for fold, (train_qids, test_qids) in enumerate(progress_iter(split_iter, desc=desc, total=len(split_iter)), start=1):
-        train_all = split_by_question_ids(df, qid_col, train_qids)
-        test_df = split_by_question_ids(df, qid_col, test_qids)
-        train_ids, cal_ids = train_test_split(
-            pd.Series(train_all[qid_col].unique()),
-            test_size=0.2,
+    for fold, (train_groups, test_groups) in enumerate(progress_iter(split_iter, desc=desc, total=len(split_iter)), start=1):
+        train_all = split_by_question_ids(df, group_col, train_groups)
+        test_df = split_by_question_ids(df, group_col, test_groups)
+        train_ids, tuning_ids = train_test_split(
+            pd.Series(train_all[group_col].unique()),
+            test_size=0.3,
             random_state=seed + fold,
         )
-        train_df = split_by_question_ids(train_all, qid_col, train_ids)
-        cal_df = split_by_question_ids(train_all, qid_col, cal_ids)
+        cal_ids, validation_ids = train_test_split(
+            pd.Series(tuning_ids),
+            test_size=0.5,
+            random_state=seed + fold + 1000,
+        )
+        train_df = split_by_question_ids(train_all, group_col, train_ids)
+        cal_df = split_by_question_ids(train_all, group_col, cal_ids)
+        validation_df = split_by_question_ids(train_all, group_col, validation_ids)
+        internal_sets = [set(train_df[group_col]), set(cal_df[group_col]), set(validation_df[group_col])]
+        if any(internal_sets[left] & internal_sets[right] for left in range(3) for right in range(left + 1, 3)):
+            raise AssertionError("Training/calibration/validation split group leakage")
+        if set(train_all[group_col]).intersection(set(test_df[group_col])):
+            raise AssertionError("Outer CV split group leakage")
         artifact_path = None
         if model_artifact_dir and dataset_name and model_name:
             artifact_path = fold_artifact_path(
@@ -1133,6 +1461,7 @@ def run_cv_voila(
         if (reuse_models or save_models) and artifact_path and artifact_path.exists():
             metadata, artifact = load_model_artifact(artifact_path)
             cal_pred, test_pred = predict_with_artifact(artifact, cal_df, test_df)
+            _, validation_pred = predict_with_artifact(artifact, cal_df, validation_df)
             print(f"    fold {fold}: loaded model artifact {artifact_path}")
         elif reuse_models and strict_reuse_models:
             raise missing_artifact_error(artifact_path)
@@ -1148,10 +1477,11 @@ def run_cv_voila(
                 feature_set=feature_set,
                 max_tfidf_features=max_tfidf_features,
                 seed=seed + fold,
-                return_artifact=bool(save_models and artifact_path),
+                return_artifact=True,
             )
+            _, cal_pred, test_pred, _, artifact = trained_result
+            _, validation_pred = predict_with_artifact(artifact, cal_df, validation_df)
             if save_models and artifact_path:
-                _, cal_pred, test_pred, _, artifact = trained_result
                 metadata = {
                     "dataset": dataset_name,
                     "model": model_name,
@@ -1162,38 +1492,72 @@ def run_cv_voila(
                     "feature_set": feature_set,
                     "max_tfidf_features": max_tfidf_features,
                     "seed": seed + fold,
-                    "train_qids": list(map(str, train_ids)),
-                    "cal_qids": list(map(str, cal_ids)),
-                    "test_qids": list(map(str, test_qids)),
+                    "split_strategy": resolved_split_strategy,
+                    "split_group_column": group_col,
+                    "train_groups": list(map(str, train_ids)),
+                    "cal_groups": list(map(str, cal_ids)),
+                    "validation_groups": list(map(str, validation_ids)),
+                    "test_groups": list(map(str, test_groups)),
                     "fidelities": [s.__dict__ for s in specs],
                     "question_col": cfg["question"],
                     "saved_at": time.strftime("%Y-%m-%d %H:%M:%S"),
                 }
                 save_model_artifact(artifact_path, artifact, metadata)
                 print(f"    fold {fold}: saved model artifact {artifact_path}")
-            else:
-                _, cal_pred, test_pred, _ = trained_result
         if policy == "acc":
             selected = np.array(["full"] * len(test_df), dtype=object)
             lam, tau, tradeoff = np.nan, np.nan, {"mode": "always_full"}
         elif policy == "thr":
             selected = select_threshold(test_pred, specs, threshold=0.5)
             lam, tau, tradeoff = np.nan, 0.5, {"mode": "fixed_probability_threshold"}
+        elif policy == "legacy":
+            lam, tau, tradeoff = tune_legacy_lam_tau(
+                validation_df, validation_pred, specs, costs, lambda_grid, tau_grid
+            )
+            selected = select_legacy_sequential(test_pred, specs, costs, lam, tau)
         else:
             lam, tau, tradeoff = tune_lam_tau(
-                cal_df,
-                cal_pred,
+                validation_df,
+                validation_pred,
                 specs,
                 costs,
                 lambda_grid,
                 tau_grid,
                 tradeoff_mode=tradeoff_mode,
                 cost_weight=cost_weight,
+                accuracy_retention=accuracy_retention,
             )
-            selected = select_voi(test_pred, specs, costs, lam, tau)
+            selected = select_voi(test_pred, specs, costs, lam)
 
         metrics = evaluate_selection(test_df, selected, specs, costs)
+        test_frontier = []
+        if policy == "voi":
+            for report_lambda in lambda_grid:
+                report_selected = select_voi(test_pred, specs, costs, report_lambda)
+                report_metrics = evaluate_selection(test_df, report_selected, specs, costs)
+                test_frontier.append(
+                    {
+                        "lambda": float(report_lambda),
+                        "accuracy": report_metrics["accuracy"],
+                        "avg_cost": report_metrics["avg_cost"],
+                        "cost_reduction_pct": report_metrics["cost_reduction_pct"],
+                    }
+                )
         calib = calibration_quality(test_df, test_pred, specs)
+        validation_calib = calibration_quality(validation_df, validation_pred, specs)
+        regret = selection_regret(test_df, selected, specs, costs, 0.0 if not np.isfinite(lam) else lam)
+        fold_query_records = query_level_records(
+            test_df,
+            test_pred,
+            selected,
+            specs,
+            costs,
+            0.0 if not np.isfinite(lam) else lam,
+            fold,
+            group_col,
+            cfg,
+        )
+        all_query_records.extend(fold_query_records)
         fold_rows.append(
             {
                 "fold": fold,
@@ -1205,14 +1569,30 @@ def run_cv_voila(
                 "cost_reduction_pct": metrics["cost_reduction_pct"],
                 "fidelity_distribution": metrics["fidelity_distribution"],
                 "calibration": calib,
+                "validation_calibration": validation_calib,
+                "selection_regret": regret,
                 "tradeoff": tradeoff,
+                "test_accuracy_cost_frontier": test_frontier,
+                "n_train_groups": int(len(train_ids)),
+                "n_cal_groups": int(len(cal_ids)),
+                "n_validation_groups": int(len(validation_ids)),
+                "n_test_groups": int(len(test_groups)),
             }
         )
         print(
             f"    fold {fold}: acc={metrics['accuracy']*100:.2f}% "
             f"cost={metrics['avg_cost']:.2f} lambda={lam} tau={tau}"
         )
-    return aggregate_folds(fold_rows)
+    out = aggregate_folds(fold_rows)
+    out["routing_rule"] = "exact_argmax_probability_minus_lambda_cost"
+    out["split_strategy"] = resolved_split_strategy
+    out["split_group_column"] = group_col
+    out["accuracy_retention"] = float(accuracy_retention)
+    out["bootstrap"] = clustered_bootstrap_ci(all_query_records, bootstrap_samples, seed)
+    out["selection_regret_mean"] = float(np.mean([r["selection_regret"] for r in fold_rows]))
+    if return_query_records:
+        out["_query_records"] = all_query_records
+    return out
 
 
 def run_cv_voila_cdf(
@@ -2197,8 +2577,20 @@ def write_rows_csv(path, rows):
     pd.DataFrame(rows).to_csv(path, index=False)
 
 
-def run_main(args, dataset, model, df, cfg, specs):
-    print(f"  main: {dataset}/{model}")
+def sha256_file(path, chunk_size=1024 * 1024):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        while True:
+            chunk = handle.read(chunk_size)
+            if not chunk:
+                break
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def run_main(args, dataset, model, df, cfg, specs, result_namespace="main", split_strategy=None):
+    active_split_strategy = split_strategy or args.split_strategy
+    print(f"  {result_namespace}: {dataset}/{model} split={active_split_strategy}")
     costs = get_costs(args)
     out = run_cv_voila(
         df,
@@ -2209,26 +2601,68 @@ def run_main(args, dataset, model, df, cfg, specs):
         args.seed,
         args.lambda_grid,
         args.tau_grid,
+        calibration=args.calibration,
         max_tfidf_features=args.max_tfidf_features,
         tradeoff_mode=args.tradeoff_mode,
         cost_weight=args.cost_weight,
         dataset_name=dataset,
         model_name=model,
-        experiment_name="main",
+        experiment_name=f"{result_namespace}_{active_split_strategy}_nested_validation",
         model_artifact_dir=args.model_artifact_dir,
         save_models=args.save_models,
         reuse_models=args.reuse_models,
         strict_reuse_models=args.strict_reuse_models,
+        split_strategy=active_split_strategy,
+        accuracy_retention=args.accuracy_retention,
+        bootstrap_samples=args.bootstrap_samples,
+        return_query_records=True,
     )
+    query_records = out.pop("_query_records", [])
+    for record in query_records:
+        record.update(
+            {
+                "dataset": dataset,
+                "model": model,
+                "calibration_method": args.calibration,
+                "split_strategy": active_split_strategy,
+                "seed": int(args.seed),
+                "cost_unit": args.cost_unit,
+            }
+        )
+    source_path = Path(args.data_dir) / MODEL_CSV_MAP[dataset][model]
     out.update(
         {
             "dataset": dataset,
             "model": model,
             "costs": costs,
             "fixed_fidelity_baselines": fixed_fidelity_baselines(df, specs, costs),
+            "provenance": {
+                "source_csv": str(source_path),
+                "source_sha256": sha256_file(source_path),
+                "seed": int(args.seed),
+                "n_rows": int(len(df)),
+                "n_unique_questions": int(df[cfg["question"]].nunique()),
+                "n_unique_images": int(df["image_id"].nunique()) if "image_id" in df else None,
+                "fidelities": [s.fidelity for s in specs],
+                "calibration": args.calibration,
+                "max_tfidf_features": int(args.max_tfidf_features),
+                "cost_unit": args.cost_unit,
+                "duplicate_image_question_pairs": int(
+                    df.duplicated(subset=["image_id", cfg["question"]], keep=False).sum()
+                ) if "image_id" in df else None,
+                "source_duplicate_image_question_rows": int(
+                    df.attrs.get("source_duplicate_image_question_rows", 0)
+                ),
+                "common_keys_csv": args.common_keys_csv,
+                "common_keys_sha256": (
+                    sha256_file(args.common_keys_csv) if args.common_keys_csv else None
+                ),
+            },
         }
     )
-    write_json(Path(args.output_dir) / "main" / dataset / model / "voila_results.json", out)
+    result_dir = Path(args.output_dir) / result_namespace / dataset / model
+    write_json(result_dir / "voila_results.json", out)
+    write_rows_csv(result_dir / "query_records.csv", query_records)
     return out
 
 
@@ -2399,14 +2833,16 @@ def run_calibration_ablation(args, dataset, model, df, cfg, specs):
     variants = [
         ("none", "none", "voi"),
         ("iso", "iso", "voi"),
-        ("temp", "temp", "voi"),
+        ("shared_platt", "shared_platt", "voi"),
+        ("legacy_sequential", "iso", "legacy"),
         ("acc", "iso", "acc"),
         ("thr", "none", "thr"),
     ]
     out = {"dataset": dataset, "model": model, "variants": {}}
+    legacy_records = []
     for name, cal, policy in variants:
         print(f"    variant={name}")
-        out["variants"][name] = run_cv_voila(
+        variant_result = run_cv_voila(
             df,
             cfg,
             specs,
@@ -2422,14 +2858,129 @@ def run_calibration_ablation(args, dataset, model, df, cfg, specs):
             cost_weight=args.cost_weight,
             dataset_name=dataset,
             model_name=model,
-            experiment_name=f"ablation_calibration_{name}",
+            experiment_name=f"ablation_calibration_{name}_nested_validation",
             model_artifact_dir=args.model_artifact_dir,
             save_models=args.save_models,
             reuse_models=args.reuse_models,
             strict_reuse_models=args.strict_reuse_models,
+            split_strategy=args.split_strategy,
+            accuracy_retention=args.accuracy_retention,
+            bootstrap_samples=args.bootstrap_samples,
+            return_query_records=name == "legacy_sequential",
         )
-    write_json(Path(args.output_dir) / "ablations" / "calibration" / dataset / model / "results.json", out)
+        if name == "legacy_sequential":
+            legacy_records = variant_result.pop("_query_records", [])
+        out["variants"][name] = variant_result
+    primary_names = ["none", "iso", "shared_platt"]
+    summaries = {}
+    for name in primary_names:
+        result = out["variants"][name]
+        fidelity_ece = {}
+        for spec in specs:
+            values = [
+                fold["validation_calibration"].get(spec.fidelity, {}).get("ece")
+                for fold in result["folds"]
+            ]
+            values = [value for value in values if value is not None]
+            if values:
+                fidelity_ece[spec.fidelity] = float(np.mean(values))
+        validation_regrets = [
+            fold.get("tradeoff", {}).get("selected", {}).get("selection_regret")
+            for fold in result["folds"]
+        ]
+        validation_regrets = [value for value in validation_regrets if value is not None]
+        summaries[name] = {
+            "mean_validation_selection_regret": (
+                float(np.mean(validation_regrets)) if validation_regrets else None
+            ),
+            "mean_validation_ece_by_fidelity": fidelity_ece,
+        }
+    iso_ece = summaries["iso"]["mean_validation_ece_by_fidelity"]
+    eligible = []
+    for name in primary_names:
+        summary = summaries[name]
+        ece_ok = all(
+            fidelity not in iso_ece
+            or summary["mean_validation_ece_by_fidelity"].get(fidelity, float("inf"))
+            <= iso_ece[fidelity] + 0.01
+            for fidelity in iso_ece
+        )
+        summary["ece_constraint_satisfied"] = bool(ece_ok)
+        if ece_ok and summary["mean_validation_selection_regret"] is not None:
+            eligible.append(name)
+    recommended = min(
+        eligible,
+        key=lambda name: (summaries[name]["mean_validation_selection_regret"], primary_names.index(name)),
+    ) if eligible else "iso"
+    out["calibrator_selection"] = {
+        "rule": "lowest validation selection regret subject to each fidelity ECE <= independent isotonic ECE + 0.01",
+        "recommended": recommended,
+        "summaries": summaries,
+    }
+    output_dir = Path(args.output_dir) / "ablations" / "calibration" / dataset / model
+    write_json(output_dir / "results.json", out)
+    if legacy_records:
+        write_rows_csv(output_dir / "legacy_query_records.csv", legacy_records)
     return out
+
+
+def run_vocab_audit(args, dataset, model, df, cfg, specs):
+    """Evaluate the planned 500/1k/2k/5k TF--IDF vocabulary grid."""
+    print(f"  TF-IDF vocabulary audit: {dataset}/{model}")
+    vocabularies = [500, 1000, 2000, 5000]
+    variants = {}
+    for vocabulary in vocabularies:
+        result = run_cv_voila(
+            df,
+            cfg,
+            specs,
+            get_costs(args),
+            args.n_cv_folds,
+            args.seed,
+            args.lambda_grid,
+            args.tau_grid,
+            calibration=args.calibration,
+            max_tfidf_features=vocabulary,
+            dataset_name=dataset,
+            model_name=model,
+            experiment_name=f"vocab_audit_{vocabulary}_nested_validation",
+            model_artifact_dir=args.model_artifact_dir,
+            save_models=args.save_models,
+            reuse_models=args.reuse_models,
+            strict_reuse_models=args.strict_reuse_models,
+            split_strategy=args.split_strategy,
+            accuracy_retention=args.accuracy_retention,
+            bootstrap_samples=args.bootstrap_samples,
+        )
+        validation_accuracy = [
+            fold["tradeoff"]["selected"]["accuracy"] for fold in result["folds"]
+        ]
+        validation_cost = [
+            fold["tradeoff"]["selected"]["avg_cost"] for fold in result["folds"]
+        ]
+        variants[str(vocabulary)] = {
+            "result": result,
+            "validation_accuracy_mean": float(np.mean(validation_accuracy)),
+            "validation_mean_cost": float(np.mean(validation_cost)),
+        }
+    best_validation = max(row["validation_accuracy_mean"] for row in variants.values())
+    accuracy_eligible = [
+        vocabulary
+        for vocabulary in vocabularies
+        if variants[str(vocabulary)]["validation_accuracy_mean"] >= best_validation - 0.005
+    ]
+    selected = min(accuracy_eligible)
+    output = {
+        "dataset": dataset,
+        "model": model,
+        "cost_unit": args.cost_unit,
+        "selection_rule": "smallest vocabulary within 0.5 absolute accuracy points of best validation accuracy; validation mean cost is reported for matched-cost review",
+        "selected_vocabulary": selected,
+        "best_validation_accuracy": best_validation,
+        "variants": variants,
+    }
+    write_json(Path(args.output_dir) / "ablations" / "tfidf_vocabulary" / dataset / model / "results.json", output)
+    return output
 
 
 def run_predictor_ablation(args, dataset, model, df, cfg, specs):
@@ -2737,11 +3288,45 @@ def generate_tables(output_dir):
                 "voila_avg_cost_mean": data["avg_cost_mean"],
                 "voila_avg_cost_std": data["avg_cost_std"],
                 "cost_reduction_pct_mean": data["cost_reduction_pct_mean"],
+                "sample_count": sum(fold["n_test"] for fold in data["folds"]),
+                "split_strategy": data.get("split_strategy"),
+                "calibration": data.get("provenance", {}).get("calibration"),
+                "common_keys_sha256": data.get("provenance", {}).get("common_keys_sha256"),
+                "accuracy_ci_low": (
+                    100.0 * data["bootstrap"]["accuracy_95ci"][0]
+                    if data.get("bootstrap", {}).get("accuracy_95ci") else None
+                ),
+                "accuracy_ci_high": (
+                    100.0 * data["bootstrap"]["accuracy_95ci"][1]
+                    if data.get("bootstrap", {}).get("accuracy_95ci") else None
+                ),
             }
         )
     if main_rows:
         write_rows_csv(table_dir / "pareto_figure_data.csv", main_rows)
         pd.DataFrame(main_rows).to_latex(table_dir / "main_results_table.tex", index=False, float_format="%.2f")
+
+    stress_rows = []
+    for path in (output_dir / "floodnet_stress").glob("*/*/voila_results.json"):
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        stress_rows.append(
+            {
+                "dataset": data["dataset"],
+                "model": data["model"],
+                "accuracy_mean": data["accuracy_mean"],
+                "accuracy_std": data["accuracy_std"],
+                "avg_cost_mean": data["avg_cost_mean"],
+                "sample_count": sum(fold["n_test"] for fold in data["folds"]),
+                "split_strategy": data.get("split_strategy"),
+                "common_keys_sha256": data.get("provenance", {}).get("common_keys_sha256"),
+            }
+        )
+    if stress_rows:
+        write_rows_csv(table_dir / "floodnet_leave_template_out.csv", stress_rows)
+        pd.DataFrame(stress_rows).to_latex(
+            table_dir / "floodnet_leave_template_out.tex", index=False, float_format="%.2f"
+        )
 
     voila_cdf_rows = []
     for path in (output_dir / "voila_cdf").glob("*/*/results.json"):
@@ -2819,19 +3404,40 @@ def generate_tables(output_dir):
 
 def parse_args():
     p = argparse.ArgumentParser(description="Run VOILA paper experiments from existing CSV outputs.")
-    p.add_argument("--datasets", nargs="+", default=["vqav2", "gqa", "textvqa", "floodnet", "locomo"], choices=list(DATASET_CONFIGS))
+    p.add_argument("--datasets", nargs="+", default=["floodnet", "vqav2", "gqa", "textvqa"], choices=list(DATASET_CONFIGS))
     p.add_argument("--models", nargs="+", default=["pixtral", "llava", "llama4", "qwen7b", "qwen72b", "qwen235b"])
-    p.add_argument("--experiments", nargs="+", default=EXPERIMENTS, choices=EXPERIMENTS)
+    p.add_argument(
+        "--experiments",
+        nargs="+",
+        default=PERCOM_OFFLINE_EXPERIMENTS,
+        choices=EXPERIMENTS,
+        help="Defaults to the cache-only PerCom experiment suite; request llm_router explicitly if needed.",
+    )
     p.add_argument("--data_dir", default=str(DEFAULT_DATA_DIR))
+    p.add_argument(
+        "--common_keys_csv",
+        default=None,
+        help="Optional image_id/question manifest used to enforce a matched cross-model population.",
+    )
     p.add_argument("--output_dir", default=str(DEFAULT_OUTPUT_DIR))
     p.add_argument("--n_cv_folds", type=int, default=5)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument("--max_rows", type=int, default=None, help="Optional per CSV row cap for smoke tests.")
     p.add_argument("--max_tfidf_features", type=int, default=500)
-    p.add_argument("--lambda_grid", nargs="+", type=float, default=[0.001, 0.005, 0.01, 0.02, 0.05, 0.1])
+    p.add_argument("--lambda_grid", nargs="+", type=float, default=[0.0, 0.001, 0.005, 0.01, 0.02, 0.05, 0.1])
     p.add_argument("--tau_grid", nargs="+", type=float, default=[-0.1, -0.05, 0.0, 0.05, 0.1, 0.15])
     p.add_argument("--full_cost", type=float, default=None, help="Uniformly rescale the default cost table so full has this value.")
     p.add_argument("--cost", nargs="*", default=[], help="Override individual costs, e.g. --cost caption=5 jpeg_q10=30 full=100.")
+    p.add_argument("--cost_unit", choices=["normalized", "bytes"], default="normalized")
+    p.add_argument("--calibration", choices=["none", "iso", "temp", "shared_platt"], default="none")
+    p.add_argument(
+        "--split_strategy",
+        choices=["auto", "question_id", "image_grouped", "question_grouped"],
+        default="auto",
+        help="auto uses image-grouped folds for FloodNet and question-id folds elsewhere.",
+    )
+    p.add_argument("--accuracy_retention", type=float, default=0.95)
+    p.add_argument("--bootstrap_samples", type=int, default=1000)
     p.add_argument("--tradeoff_mode", choices=["pareto_knee", "accuracy_cost"], default="pareto_knee")
     p.add_argument("--cost_weight", type=float, default=0.5, help="Only used when --tradeoff_mode accuracy_cost.")
     p.add_argument("--recall_threshold", type=float, default=70.0, help="rapidfuzz partial-ratio threshold for fuzzy recall correctness.")
@@ -2851,7 +3457,7 @@ def parse_args():
     p.add_argument("--model_artifact_dir", default=str(ROOT / "model_artifacts"), help="Directory for reusable fold model artifacts.")
     p.add_argument("--n_llm_router_samples", type=int, default=1000)
     p.add_argument("--llm_router_routing", choices=["binary", "ternary"], default="ternary")
-    p.add_argument("--llm_router_backend", choices=["heuristic", "azure_gpt4o"], default="azure_gpt4o")
+    p.add_argument("--llm_router_backend", choices=["heuristic", "azure_gpt4o"], default="heuristic")
     p.add_argument(
         "--azure_openai_url",
         default="https://azureapi.zotgpt.uci.edu/openai/deployments/gpt-4o/chat/completions?api-version=2024-02-01",
@@ -2904,6 +3510,8 @@ def normalize_args(args):
     args.model_artifact_dir = str(Path(args.model_artifact_dir).resolve())
     args.llm_router_cache_dir = str(Path(args.llm_router_cache_dir).resolve())
     args.azure_openai_api_key_file = str(Path(args.azure_openai_api_key_file).resolve())
+    if args.common_keys_csv:
+        args.common_keys_csv = str(Path(args.common_keys_csv).resolve())
     args.resolved_costs = resolve_costs_from_args(args)
     if int(args.n_jobs) <= 0:
         args.n_jobs = max(1, (os.cpu_count() or 2) - 1)
@@ -2917,7 +3525,9 @@ def run_pairwise_job(args_dict, dataset, model, experiments):
     global RECALL_MATCH_THRESHOLD
     RECALL_MATCH_THRESHOLD = args.recall_threshold
     try:
-        df, cfg, specs, csv_path = load_dataset(dataset, model, args.data_dir, args.max_rows, args.seed)
+        df, cfg, specs, csv_path = load_dataset(
+            dataset, model, args.data_dir, args.max_rows, args.seed, args.common_keys_csv
+        )
     except Exception as exc:
         print(f"[skip] {dataset}/{model}: {exc}")
         return {"kind": "pairwise", "dataset": dataset, "model": model, "status": "skipped", "error": str(exc)}
@@ -2932,6 +3542,17 @@ def run_pairwise_job(args_dict, dataset, model, experiments):
         run_obs2(args, dataset, model, df, specs)
     if "main" in experiments:
         run_main(args, dataset, model, df, cfg, specs)
+    if "floodnet_stress" in experiments and dataset == "floodnet":
+        run_main(
+            args,
+            dataset,
+            model,
+            df,
+            cfg,
+            specs,
+            result_namespace="floodnet_stress",
+            split_strategy="question_grouped",
+        )
     if "voila_cdf" in experiments:
         run_voila_cdf(args, dataset, model, df, cfg, specs)
     if "cascade" in experiments:
@@ -2940,7 +3561,9 @@ def run_pairwise_job(args_dict, dataset, model, experiments):
         run_llm_router(args, dataset, model, df, cfg, specs)
     if "bert_router" in experiments:
         run_bert_router(args, dataset, model, df, cfg, specs)
-    if "ablation_calibration" in experiments and dataset in {"vqav2", "gqa"}:
+    if "vocab_audit" in experiments and dataset == "floodnet":
+        run_vocab_audit(args, dataset, model, df, cfg, specs)
+    if "ablation_calibration" in experiments and dataset in {"vqav2", "gqa", "textvqa", "floodnet"}:
         run_calibration_ablation(args, dataset, model, df, cfg, specs)
     if "ablation_predictor" in experiments and dataset in {"vqav2", "gqa"} and model == "pixtral":
         run_predictor_ablation(args, dataset, model, df, cfg, specs)
@@ -3002,6 +3625,33 @@ def main():
     RECALL_MATCH_THRESHOLD = args.recall_threshold
     print(f"VOILA experiments | data={args.data_dir} | output={args.output_dir} | n_jobs={args.n_jobs}", flush=True)
     args_dict = vars(args).copy()
+    manifest_sources = []
+    for dataset in args.datasets:
+        for model in args.models:
+            relative = MODEL_CSV_MAP.get(dataset, {}).get(model)
+            if not relative:
+                continue
+            source = Path(args.data_dir) / relative
+            if source.exists():
+                manifest_sources.append(
+                    {
+                        "dataset": dataset,
+                        "model": model,
+                        "path": str(source.resolve()),
+                        "sha256": sha256_file(source),
+                        "bytes": source.stat().st_size,
+                    }
+                )
+    manifest_payload = {
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S %z"),
+        "arguments": args_dict,
+        "runner_sha256": sha256_file(__file__),
+        "sources": manifest_sources,
+        "no_new_vlm_inference": "true unless llm_router is explicitly requested with azure_gpt4o",
+    }
+    manifest_name = f"run_{time.strftime('%Y%m%d_%H%M%S')}_{os.getpid()}.json"
+    write_json(Path(args.output_dir) / "run_manifests" / manifest_name, manifest_payload)
+    write_json(Path(args.output_dir) / "run_manifest.json", manifest_payload)
 
     pair_experiments = [e for e in args.experiments if e in PAIRWISE_EXPERIMENTS]
     sequential_router_experiments = []
