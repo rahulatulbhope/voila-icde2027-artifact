@@ -1,0 +1,18 @@
+# Core VOILA analysis, tests, plotting, and PerCom tooling.
+joblib
+matplotlib
+numpy
+pandas
+Pillow
+psutil
+rapidfuzz
+scikit-learn
+scipy
+tqdm
+word2number
+
+# Optional Hugging Face generation dependencies:
+# datasets
+# sentence-transformers
+# torch
+# transformers

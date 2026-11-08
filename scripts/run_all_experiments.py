@@ -265,6 +265,8 @@ EXPERIMENTS = [
 PERCOM_OFFLINE_EXPERIMENTS = [
     "main",
     "floodnet_stress",
+    "cascade",
+    "bert_router",
     "vocab_audit",
     "oracle",
     "ablation_calibration",
@@ -1042,6 +1044,32 @@ def query_level_records(df, pred_df, selected, specs, costs, lam, fold, group_co
     return records
 
 
+def baseline_query_level_records(
+    df, selected, selected_costs, specs, costs, fold, group_col, cfg, policy
+):
+    """Create the common query-record schema for non-VOILA policies."""
+    records = []
+    for pos, (_, row) in enumerate(df.iterrows()):
+        chosen = str(selected[pos])
+        record = {
+            "fold": int(fold),
+            "cluster_id": str(row[group_col]),
+            "question_id": str(row[cfg["qid"]]),
+            "image_id": str(row["image_id"]) if "image_id" in row else None,
+            "question": str(row[cfg["question"]]),
+            "policy": str(policy),
+            "selected_fidelity": chosen,
+            "selected_cost": float(selected_costs[pos]),
+            "selected_correct": bool(row[f"correct_{chosen}"]),
+        }
+        for spec in specs:
+            fidelity = spec.fidelity
+            record[f"cost_{fidelity}"] = float(costs[fidelity])
+            record[f"correct_{fidelity}"] = bool(row[f"correct_{fidelity}"])
+        records.append(record)
+    return records
+
+
 def clustered_bootstrap_ci(records, n_boot=1000, seed=42):
     """Cluster bootstrap CIs for accuracy and mean selected cost."""
     if not records:
@@ -1802,7 +1830,7 @@ def oracle_metrics(df, specs, costs):
     }
 
 
-def cascade_metrics(df, specs, costs, thresholds):
+def cascade_metrics(df, specs, costs, thresholds, return_selections=False):
     ordered = sorted(specs, key=lambda s: costs[s.fidelity])
     lp = {s.fidelity: logprob_scores(df, s) for s in ordered}
     selected = []
@@ -1824,12 +1852,16 @@ def cascade_metrics(df, specs, costs, thresholds):
         selected.append(picked)
         total_cost.append(spent)
         correct.append(bool(df.iloc[i].get(f"correct_{picked}", False)))
-    return {
+    result = {
         "accuracy": float(np.mean(correct)),
         "avg_cost": float(np.mean(total_cost)),
         "cost_reduction_pct": float((costs["full"] - np.mean(total_cost)) / costs["full"] * 100.0),
         "fidelity_distribution": {k: round(v / len(selected), 6) for k, v in Counter(selected).items()},
     }
+    if return_selections:
+        result["selected"] = selected
+        result["selected_costs"] = total_cost
+    return result
 
 
 def cdf_separation_threshold_from_scores(scores, labels):
@@ -1914,14 +1946,29 @@ def learn_pairwise_cascade_thresholds(df, specs, costs):
     return thresholds, details
 
 
-def run_cv_cascade(df, cfg, specs, costs, n_folds, seed):
+def run_cv_cascade(
+    df, cfg, specs, costs, n_folds, seed, dataset_name=None,
+    split_strategy="auto", bootstrap_samples=1000, return_query_records=False,
+):
     rows = []
-    split_iter = list(make_outer_splits(df, cfg["qid"], n_folds, seed))
+    all_query_records = []
+    df, group_col, resolved_split_strategy = prepare_split_groups(
+        df, cfg, dataset_name=dataset_name, split_strategy=split_strategy
+    )
+    split_iter = list(make_outer_splits(df, group_col, n_folds, seed))
     for fold, (train_qids, test_qids) in enumerate(progress_iter(split_iter, desc="cascade folds", total=len(split_iter)), start=1):
-        train_df = split_by_question_ids(df, cfg["qid"], train_qids)
-        test_df = split_by_question_ids(df, cfg["qid"], test_qids)
+        train_df = split_by_question_ids(df, group_col, train_qids)
+        test_df = split_by_question_ids(df, group_col, test_qids)
         thresholds, threshold_info = learn_pairwise_cascade_thresholds(train_df, specs, costs)
-        m = cascade_metrics(test_df, specs, costs, thresholds)
+        m = cascade_metrics(test_df, specs, costs, thresholds, return_selections=True)
+        selected = m.pop("selected")
+        selected_costs = m.pop("selected_costs")
+        all_query_records.extend(
+            baseline_query_level_records(
+                test_df, selected, selected_costs, specs, costs, fold, group_col, cfg,
+                "logprob_cascade",
+            )
+        )
         rows.append({"fold": fold, "thresholds": thresholds, "threshold_info": threshold_info, **m})
         compact = ", ".join(f"{edge}:{theta:.3f}" for edge, theta in thresholds.items())
         print(
@@ -1947,6 +1994,11 @@ def run_cv_cascade(df, cfg, specs, costs, n_folds, seed):
     out["threshold_values"] = [r["thresholds"] for r in rows]
     out["threshold_method"] = "pairwise_max_cdf_separation"
     out["threshold_details"] = [r["threshold_info"] for r in rows]
+    out["split_strategy"] = resolved_split_strategy
+    out["split_group_column"] = group_col
+    out["bootstrap"] = clustered_bootstrap_ci(all_query_records, bootstrap_samples, seed)
+    if return_query_records:
+        out["_query_records"] = all_query_records
     return out
 
 
@@ -2431,9 +2483,15 @@ def run_cv_bert_router(
     save_models,
     reuse_models,
     strict_reuse_models,
+    split_strategy="auto",
+    bootstrap_samples=1000,
+    return_query_records=False,
 ):
     rows = []
-    qid_col = cfg["qid"]
+    all_query_records = []
+    df, qid_col, resolved_split_strategy = prepare_split_groups(
+        df, cfg, dataset_name=dataset_name, split_strategy=split_strategy
+    )
     split_iter = list(make_outer_splits(df, qid_col, n_folds, seed))
     for fold, (train_qids, test_qids) in enumerate(
         progress_iter(split_iter, desc=f"{dataset_name}/{model_name} bert_router folds", total=len(split_iter)),
@@ -2445,7 +2503,7 @@ def run_cv_bert_router(
             model_artifact_dir,
             dataset_name,
             model_name,
-            "bert_router",
+            f"bert_router_{resolved_split_strategy}",
             fold,
             "LogReg",
             "none",
@@ -2502,6 +2560,13 @@ def run_cv_bert_router(
         pred_enc = artifact["classifier"].predict(x_test)
         selected = artifact["label_encoder"].inverse_transform(np.asarray(pred_enc, dtype=int))
         metrics = evaluate_selection(test_df, selected, specs, costs)
+        selected_costs = [costs[str(fidelity)] for fidelity in selected]
+        all_query_records.extend(
+            baseline_query_level_records(
+                test_df, selected, selected_costs, specs, costs, fold, qid_col, cfg,
+                "bert_router",
+            )
+        )
         rows.append(
             {
                 "fold": fold,
@@ -2534,6 +2599,11 @@ def run_cv_bert_router(
     out["feature_set"] = feature_set
     out["target_label"] = "cheapest_sufficient_fidelity_else_full"
     out["folds"] = rows
+    out["split_strategy"] = resolved_split_strategy
+    out["split_group_column"] = qid_col
+    out["bootstrap"] = clustered_bootstrap_ci(all_query_records, bootstrap_samples, seed)
+    if return_query_records:
+        out["_query_records"] = all_query_records
     return out
 
 
@@ -2710,7 +2780,14 @@ def run_oracle(args, dataset, model, df, specs):
 def run_cascade(args, dataset, model, df, cfg, specs):
     print(f"  cascade: {dataset}/{model}")
     costs = get_costs(args)
-    out = run_cv_cascade(df, cfg, specs, costs, args.n_cv_folds, args.seed)
+    out = run_cv_cascade(
+        df, cfg, specs, costs, args.n_cv_folds, args.seed,
+        dataset_name=dataset, split_strategy=args.split_strategy,
+        bootstrap_samples=args.bootstrap_samples, return_query_records=True,
+    )
+    query_records = out.pop("_query_records", [])
+    for record in query_records:
+        record.update({"dataset": dataset, "model": model, "cost_unit": args.cost_unit})
     out.update(
         {
             "dataset": dataset,
@@ -2720,7 +2797,9 @@ def run_cascade(args, dataset, model, df, cfg, specs):
             "max_possible_cascade_cost": float(sum(costs[s.fidelity] for s in specs)),
         }
     )
-    write_json(Path(args.output_dir) / "baselines" / "logprob_cascade" / dataset / model / "results.json", out)
+    result_dir = Path(args.output_dir) / "baselines" / "logprob_cascade" / dataset / model
+    write_json(result_dir / "results.json", out)
+    write_rows_csv(result_dir / "query_records.csv", query_records)
     return out
 
 
@@ -2803,7 +2882,13 @@ def run_bert_router(args, dataset, model, df, cfg, specs):
             args.save_models,
             args.reuse_models,
             args.strict_reuse_models,
+            split_strategy=args.split_strategy,
+            bootstrap_samples=args.bootstrap_samples,
+            return_query_records=True,
         )
+        query_records = payload.pop("_query_records", [])
+        for record in query_records:
+            record.update({"dataset": dataset, "model": model, "cost_unit": args.cost_unit})
         out = {"dataset": dataset, "model": model, "costs": get_costs(args), **payload}
     except Exception as exc:
         if args.bert_router_fail_on_error:
@@ -2817,7 +2902,10 @@ def run_bert_router(args, dataset, model, df, cfg, specs):
             "router_kind": "supervised_fidelity_classifier",
         }
         print(f"    skipped bert_router: {exc}")
-    write_json(Path(args.output_dir) / "baselines" / "bert_router" / dataset / model / "results.json", out)
+    result_dir = Path(args.output_dir) / "baselines" / "bert_router" / dataset / model
+    write_json(result_dir / "results.json", out)
+    if out.get("status") != "skipped":
+        write_rows_csv(result_dir / "query_records.csv", query_records)
     return out
 
 
@@ -3040,6 +3128,9 @@ def run_feature_ablation(args, dataset, model, df, cfg, specs):
                 save_models=args.save_models,
                 reuse_models=args.reuse_models,
                 strict_reuse_models=args.strict_reuse_models,
+                split_strategy=args.split_strategy,
+                accuracy_retention=args.accuracy_retention,
+                bootstrap_samples=args.bootstrap_samples,
             )
         except Exception as exc:
             out["features"][feature_set] = {"status": "skipped", "reason": str(exc)}
@@ -3429,7 +3520,7 @@ def parse_args():
     p.add_argument("--full_cost", type=float, default=None, help="Uniformly rescale the default cost table so full has this value.")
     p.add_argument("--cost", nargs="*", default=[], help="Override individual costs, e.g. --cost caption=5 jpeg_q10=30 full=100.")
     p.add_argument("--cost_unit", choices=["normalized", "bytes"], default="normalized")
-    p.add_argument("--calibration", choices=["none", "iso", "temp", "shared_platt"], default="none")
+    p.add_argument("--calibration", choices=["none", "iso", "temp", "shared_platt"], default="iso")
     p.add_argument(
         "--split_strategy",
         choices=["auto", "question_id", "image_grouped", "question_grouped"],
@@ -3567,9 +3658,9 @@ def run_pairwise_job(args_dict, dataset, model, experiments):
         run_calibration_ablation(args, dataset, model, df, cfg, specs)
     if "ablation_predictor" in experiments and dataset in {"vqav2", "gqa"} and model == "pixtral":
         run_predictor_ablation(args, dataset, model, df, cfg, specs)
-    if "ablation_features" in experiments and dataset == "vqav2" and model == "pixtral":
+    if "ablation_features" in experiments and dataset in {"vqav2", "floodnet"}:
         run_feature_ablation(args, dataset, model, df, cfg, specs)
-    if "feature_importance" in experiments and dataset in {"vqav2", "gqa"}:
+    if "feature_importance" in experiments and dataset in {"vqav2", "gqa", "floodnet"}:
         run_feature_importance(args, dataset, model, df, cfg, specs)
 
     return {"kind": "pairwise", "dataset": dataset, "model": model, "status": "ok"}

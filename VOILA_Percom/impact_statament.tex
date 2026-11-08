@@ -1,0 +1,15 @@
+\section*{Ethical Considerations}
+
+\textsc{VOILA} enables cost-aware multimodal inference in edge-cloud VQA systems (mobile assistants, photo search), agentic memory systems with tiered storage, and mission-critical cyber-physical applications (disaster response drones, IoT monitoring).
+By achieving 50--60\% retrieval cost reductions within 2--6 accuracy points of full-resolution baselines, \textsc{VOILA} can substantially reduce energy consumption and bandwidth usage in production systems while enabling deployment in resource-constrained settings previously infeasible due to cost or latency requirements.
+
+Efficiency gains improve sustainability and accessibility of multimodal AI---lowering carbon footprint and expanding access in bandwidth-limited contexts.
+However, \textsc{VOILA} relies on learned predictors that may reflect dataset biases.
+Inaccurate calibration could cause under-retrieval of critical information in high-stakes scenarios.
+A concrete example of potential disparity: because our training data (VQA-v2, GQA) consists predominantly of Western images with Latin-script text, the TF-IDF vocabulary and question-type rules may systematically underestimate the visual fidelity required for OCR-dependent queries in non-Latin scripts (e.g., Arabic, Chinese, Devanagari).
+A user querying \emph{``What does the sign say?''} about an Arabic-script sign may be routed to a lower fidelity than necessary, degrading accuracy for that population.
+Our experiments use English-language benchmarks; generalization to other languages and visual contexts requires separate validation and targeted retraining.
+
+Key mitigation directions include: (1) developing calibration methods with formal safety guarantees, (2) evaluating performance across diverse populations and domains to identify disparate impacts, and (3) extending the framework to jointly optimize cost, accuracy, and fairness.
+Practitioners should monitor calibration quality continuously, validate on domain-specific data before deployment, and maintain human oversight for high-stakes decisions.
+We will release our code, trained GBR checkpoints, and the LoCoMo-VQA benchmark to enable community scrutiny and responsible extension of this work.

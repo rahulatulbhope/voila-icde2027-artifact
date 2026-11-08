@@ -122,5 +122,47 @@ class PopulationTests(unittest.TestCase):
             self.assertEqual(set(map(tuple, common.to_numpy())), {("b", "q2"), ("c", "q3")})
 
 
+class TraceSimulationTests(unittest.TestCase):
+    def test_packetization_uses_1400_byte_opportunities(self):
+        timestamps = np.arange(0.0, 10.0)
+        self.assertEqual(percom.replay_deadline(1400, timestamps)["packets"], 1)
+        self.assertEqual(percom.replay_deadline(1401, timestamps)["packets"], 2)
+
+    def test_circular_trace_wraparound_is_analytic(self):
+        timestamps = np.array([0.0, 1.0, 2.0])
+        latency = percom.circular_completion_latencies(2800, timestamps, [1.5])
+        self.assertAlmostEqual(float(latency[0]), 0.5)
+        wrapped = percom.circular_completion_latencies(2800, timestamps, [1.9])
+        self.assertAlmostEqual(float(wrapped[0]), 0.1)
+
+    def test_deterministic_offsets_are_uniform_and_seeded(self):
+        left = percom.deterministic_trace_offsets(10.0, 100, 2027, "query-a")
+        right = percom.deterministic_trace_offsets(10.0, 100, 2027, "query-a")
+        self.assertTrue(np.array_equal(left, right))
+        self.assertTrue(np.allclose(np.diff(left), 0.1))
+        self.assertTrue(np.all((left >= 0) & (left < 10.0)))
+
+
+class BaselineRecordTests(unittest.TestCase):
+    def test_baseline_records_match_enriched_schema(self):
+        specs = [
+            experiments.FidelitySpec("caption", "caption", "a", "p", "l"),
+            experiments.FidelitySpec("full", "full", "a2", "p2", "l2"),
+        ]
+        frame = pd.DataFrame({
+            "image_id": ["i"], "question_id": [1], "question": ["q"],
+            "correct_caption": [True], "correct_full": [False],
+        })
+        records = experiments.baseline_query_level_records(
+            frame, np.array(["caption"]), np.array([3.0]), specs,
+            {"caption": 3.0, "full": 9.0}, 1, "image_id",
+            {"qid": "question_id", "question": "question"}, "bert_router",
+        )
+        self.assertEqual(records[0]["policy"], "bert_router")
+        self.assertEqual(records[0]["selected_cost"], 3.0)
+        self.assertTrue(records[0]["selected_correct"])
+        self.assertIn("correct_full", records[0])
+
+
 if __name__ == "__main__":
     unittest.main()

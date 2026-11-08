@@ -41,6 +41,19 @@ scripts/results_final_smoke_additional/
 *.tar.gz
 *.7z
 
+# Local review/build state
+tmp/
+tmp_*.txt
+VOILA_Percom/.claude/
+VOILA_Percom/.git*
+*.aux
+*.log
+*.blg
+*.bbl
+*.out
+*.fls
+*.fdb_latexmk
+
 # Third-party replay tools and downloaded raw imagery
 external/
 raw_data/

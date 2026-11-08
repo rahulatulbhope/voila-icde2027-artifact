@@ -1,0 +1,94 @@
+\section{Appendix: Datasets}
+\label{sec:datasets}
+
+We evaluate \textsc{VOILA} on five datasets spanning standard VQA benchmarks, text-centric reasoning, cyber--physical perception, and long-horizon agentic memory.
+Table~\ref{tab:dataset_stats} summarizes the dataset statistics and experimental splits used throughout this work.
+
+\begin{table}[h]
+\centering
+\small
+\caption{\textbf{Dataset statistics and experimental splits.} All splits are the standard published splits unless otherwise noted. LoCoMo-VQA is our GPT-4o-generated benchmark.}
+\label{tab:dataset_stats}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Dataset} & \textbf{Images} & \textbf{Questions} & \textbf{Split used} \\
+\midrule
+VQA-v2   & 81{,}434 & 214{,}354 & val \\
+GQA      & 22{,}669 & 12{,}578  & balanced test \\
+TextVQA  & 5{,}734  & 5{,}734   & val \\
+FloodNet & 2{,}343  & 4{,}511   & test \\
+LoCoMo-VQA & 700   & 3{,}500   & generated \\
+\bottomrule
+\end{tabular}
+\end{table}
+Together, these datasets allow us to assess accuracy--cost tradeoffs under diverse visual content, linguistic structure, and deployment constraints.
+
+\subsection{VQA-v2, GQA, and TextVQA}
+\label{sec:vqa_datasets}
+\paragraph{VQA-v2.}
+VQA-v2 \cite{goyal2017vqav2} is a large-scale visual question answering benchmark consisting of real-world images paired with free-form questions and short answers.
+It covers a broad range of question types, including object recognition, counting, attributes, and commonsense reasoning, and is designed to reduce language priors through balanced answer distributions.
+We use the standard train/validation splits.
+
+\paragraph{GQA.}
+GQA \cite{hudson2019gqa} focuses on compositional and relational reasoning over images.
+Questions are generated from structured scene graphs and emphasize multi-step reasoning, spatial relations, and logical composition.
+We use GQA to test whether VOI generalizes beyond surface-level recognition to structured visual reasoning.
+
+\paragraph{TextVQA.}
+TextVQA \cite{singh2019textvqa} evaluates text-centric visual understanding, requiring models to read and reason over scene text embedded in images.
+This dataset stresses OCR-dependent perception and complements VQA-v2 and GQA by emphasizing linguistic grounding in visual text.
+
+\subsection{FloodNet}
+\label{sec:floodnet}
+FloodNet \cite{rahnemoonfar2021floodnet} is an aerial imagery dataset captured by UAVs during Hurricane Harvey, designed for disaster damage assessment.
+It includes a native VQA component in which free-form questions are paired with short answers about flood conditions visible in each image (e.g., \emph{``Is the road flooded?''}, \emph{``What is the condition of the building?''}, \emph{``How many flooded buildings are visible?''}).
+Question--answer pairs are drawn directly from the original FloodNet release; no additional generation was performed.
+We use the FloodNet test split and evaluate models on exact-match accuracy against the provided reference answers.
+FloodNet serves as a proxy for cost-sensitive perception in bandwidth-constrained IoT and emergency-response deployments, where transmission of high-resolution UAV imagery is expensive and decisions must be made under latency constraints.
+
+\subsection{LoCoMo Question Generation.}
+\label{sec:locomo}
+LoCoMo~\cite{wang2024locomo} evaluates long-horizon agentic memory retrieval, where an agent must decide when expensive visual memory recall is necessary.
+Unlike static VQA datasets, LoCoMo natively provides only (i) caption-level summaries cached in memory and (ii) the original image available via costly on-demand recall.
+
+To enable quantitative evaluation, we construct a VQA-style benchmark over LoCoMo memory items.
+Starting from LoCoMo conversational memory entries containing an image URL and associated evidence text, we generate a total of 3,500 question--answer pairs.
+For each image, we produce multiple questions that are explicitly constrained to:
+(i) reference visual content present in the image,
+(ii) be relevant to the conversational evidence text, and
+(iii) require varying degrees of visual detail to answer.
+
+Question generation is performed using GPT-4o conditioned jointly on the image and its evidence text.
+For each image, we generate a diverse set of questions spanning object counting, yes/no verification, spatial relations, attribute identification, and scene-level understanding using the following prompt:
+
+\begin{quote}
+\small
+\texttt{Based on this image and the provided evidence text, generate exactly 5 diverse Visual Question Answering (VQA) questions with their answers.}
+
+\texttt{Evidence text: \{evidence\_text\}}
+
+\texttt{Generate questions in these categories:}\\
+\texttt{1. Object counting (e.g., "How many people are in the image?")}\\
+\texttt{2. Yes/No question (e.g., "Is there a dog in the image?")}\\
+\texttt{3. Spatial awareness (e.g., "Where is the person standing?")}\\
+\texttt{4. Object identification (e.g., "What color is the shirt?")}\\
+\texttt{5. Scene understanding (e.g., "What activity is happening?")}
+
+\texttt{Return ONLY a JSON array with 5 objects, each having "question" and "answer" fields. Example format:}\\
+\texttt{[}\\
+\texttt{\ \ \{\{"question": "How many people are visible?", "answer": "2"\}\},}\\
+\texttt{\ \ \{\{"question": "Is there a tree in the background?", "answer": "yes"\}\},}\\
+\texttt{\ \ ...}\\
+\texttt{]}
+\end{quote}
+
+All generated questions are paired with answers produced by GPT-4o and filtered by the authors to remove questions that (i) cannot be answered from the image alone, (ii) contain hallucinated object references, or (iii) have ambiguous or non-unique answers.
+Of the 4{,}375 initially generated QA pairs (875 images × 5 questions), 875 (20\%) were discarded during filtering, yielding 3{,}500 final pairs.
+We note two important caveats of this construction.
+First, using GPT-4o as both the question generator and the reference-answer provider means ground-truth answers reflect GPT-4o's visual interpretation; hallucinated answers propagate into the evaluation metric.
+Second, the prompt enforces exactly one question per category per image, producing a uniform question-type distribution (20\% each) that differs from natural VQA distributions where yes/no questions are overrepresented.
+We use LoCoMo exclusively as an out-of-distribution stress test and not as a primary benchmark; these construction choices are further discussed in the Limitations section.
+
+This construction yields a LoCoMo-derived VQA benchmark that preserves the core constraint of agentic memory systems---cheap semantic summaries with expensive high-fidelity recall---while enabling controlled measurement of adaptive fidelity selection.
+All LoCoMo experiments are conducted in a fully out-of-distribution setting: \textsc{VOILA} is trained on VQA-v2 and GQA and evaluated on LoCoMo without any task-specific retraining.

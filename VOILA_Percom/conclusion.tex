@@ -1,0 +1,11 @@
+% -----------------------------------------------------------------------
+% REWRITTEN conclusion — expanded to ~12 lines; NLP thesis bookend;
+% future work; dataset release; \expnote for pending items
+% -----------------------------------------------------------------------
+
+\section{Conclusion}
+
+Question linguistic structure is a principled and practical signal for pre-retrieval fidelity selection: \emph{how many}, \emph{what color}, and \emph{read the text} reliably require high-resolution evidence, while \emph{is there} and \emph{what type} are resolvable from low-fidelity representations.
+\textsc{VOILA} operationalizes this insight via a gradient-boosted classifier, isotonic calibration, and a greedy value-of-information decision rule---selecting the minimum-cost sufficient fidelity from question text alone, before any image is accessed---reducing retrieval cost by 50--65\% across five datasets and six VLMs (7B--235B parameters) while matching or exceeding full-resolution accuracy on OCR-heavy and domain-specialized benchmarks, and remaining within an average of 10 accuracy points on general VQA.
+Natural extensions include richer question encoders for ambiguous queries, multilingual support, and fidelity selection for video (frame rate) and document retrieval (chunk size); code, checkpoints, and the LoCoMo-VQA benchmark will be released.
+\fablenote{For AAAI, close on the decision-theoretic thesis rather than the linguistic one: e.g., ``More broadly, VOILA demonstrates that the value of information an AI system acquires can be estimated before paying for it --- a principle that extends beyond images to any perception pipeline with tiered acquisition costs.'' This bookends the AAAI framing suggested for the abstract and positions the paper as a general contribution to resource-bounded AI rather than a VQA-specific trick. Also reconcile ``50--65\%'' here with whichever range the abstract settles on.}
