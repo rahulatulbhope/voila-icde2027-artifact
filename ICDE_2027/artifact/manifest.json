@@ -10,8 +10,8 @@
     "source_repository": "https://github.com/jayaramkr/voila-papers.git",
     "source_path": "ICDE_2027/paper/source"
   },
-  "google_drive_url": null,
-  "google_drive_url_status": "required_before_submission",
+  "google_drive_url": "https://drive.google.com/file/d/1i6orLyJELF1ZFj-bpSZmMcZqAW60SOV7/view?usp=drive_link",
+  "google_drive_url_status": "supplied_by_user_pending_public_access_check",
   "icde_specific_artifacts_status": "missing_from_latest_public_repository",
   "icde_specific_artifacts": [
     "generated_icde/placement_table.tex",

@@ -17,7 +17,8 @@ package. It is not a replacement for the official ICDE instructions.
 
 ## Required before submitting
 
-- Put the real public Google Drive URL in `ICDE_2027/artifact/manifest.json`.
+- Confirm the supplied Google Drive file URL is public and remains recorded in
+  `ICDE_2027/artifact/manifest.json`.
 - Download the Drive bundle from a clean machine and run the restore script.
 - Verify the restored bundle is readable and the hashes in
   `VOILA_Percom/generated/artifact_manifest.json` still match the checked-in

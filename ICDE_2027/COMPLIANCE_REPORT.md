@@ -31,8 +31,9 @@ latest `jayaramkr/voila-papers` commit `ae78b3fac43e0475d3e2f2ede8f69cd074260b9f
   or placement/OOD outputs referenced in the source comments. ICDE requires
   experiment papers to provide the artifacts needed to reproduce the reported
   results.
-- Public artifact URL: no Google Drive URL has been supplied, and the manifest
-  still has `google_drive_url: null`.
+- Public artifact URL: a Google Drive file URL has been supplied and recorded
+  in the manifest, but public viewer access and the file's contents still need
+  to be tested from a clean/private browser session.
 - CMT metadata: ORCIDs, conflict-of-interest declarations, track selection,
   concurrent-submission status, and final author order must be checked in CMT
   and with the coauthors.
@@ -42,6 +43,6 @@ latest `jayaramkr/voila-papers` commit `ae78b3fac43e0475d3e2f2ede8f69cd074260b9f
 1. Add the missing ICDE-specific generated artifacts and their producing
    scripts to the public supplemental bundle, or remove the claims that cannot
    be reproduced from the bundle.
-2. Set `google_drive_url` in `artifact/manifest.json` to a public viewer link
-   and test it from a private browser session.
+2. Test the supplied `google_drive_url` from a private browser session and
+   confirm that it contains the complete supplemental bundle.
 3. Confirm all CMT metadata and the ICDE novelty/concurrent-submission rules.

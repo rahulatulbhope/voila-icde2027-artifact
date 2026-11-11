@@ -2,8 +2,7 @@
 
 This directory is the ICDE-specific companion to the main VOILA repository.
 It keeps the edited ICDE manuscript separate from the IEEE PerCom master and
-documents the reproducibility bundle that should be shared through a public
-Google Drive folder.
+documents the reproducibility bundle shared through Google Drive.
 
 ## Paper
 
@@ -23,18 +22,17 @@ Google Drive folder.
 ## Artifact link
 
 ICDE requires supplemental material to be provided through a standard,
-openly accessible file-sharing URL. The actual Google Drive URL was not
-present in the repository or the supplied PDF, so the manifest intentionally
-contains `null` until the public folder URL is supplied:
+openly accessible file-sharing URL. The supplied Drive file link is recorded
+in `artifact/manifest.json` and should also be entered in the CMT
+supplemental-material field:
 
 ```text
-ICDE_2027/artifact/manifest.json
+https://drive.google.com/file/d/1i6orLyJELF1ZFj-bpSZmMcZqAW60SOV7/view?usp=drive_link
 ```
 
-Set the folder to “Anyone with the link” (viewer), paste its URL into the
-manifest, and use that same URL in the CMT supplemental-material field. Do not
-make the folder editable or include credentials, API keys, or private model
-tokens.
+The file must be shared as “Anyone with the link” (viewer). If it is a zip
+bundle, extract it before using the restore script below. Do not include
+credentials, API keys, or private model tokens.
 
 ## Google Drive bundle
 
@@ -80,7 +78,7 @@ described in the handoff.
 - [x] Editable ICDE source and figures are included and rebuild successfully.
 - [x] PerCom and ICDE paper masters remain independent.
 - [x] Reproducibility bundle paths and restoration procedure are documented.
-- [ ] Replace the manifest's `google_drive_url` with the real public Drive URL.
+- [x] Record the supplied Google Drive file URL in the artifact manifest.
 - [ ] Confirm all authors' ORCIDs in CMT.
 - [ ] Confirm the Drive folder is accessible in an incognito/browser session.
 - [ ] Upload the PDF and supplemental URL to the correct ICDE CMT round.
