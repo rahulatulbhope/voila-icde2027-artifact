@@ -2,14 +2,28 @@
   "artifact_package": "VOILA-ICDE-2027",
   "paper": {
     "path": "ICDE_2027/paper/icde2027_author_edited.pdf",
-    "sha256": "f19db14814bff2cd254efd472a70df2eaa41a6ad8932af2efc1d701f5693339a",
+    "sha256": "7ce9f5ea2d8c2dc64cf3d8973950da62dd1702ba6b18a6a922510e2752c724de",
     "pages_total": 14,
     "technical_pages": 12,
     "references_and_ai_ack_pages": 2,
-    "source_note": "Supplied edited PDF; editable LaTeX source was not found locally."
+    "source_commit": "ae78b3fac43e0475d3e2f2ede8f69cd074260b9f",
+    "source_repository": "https://github.com/jayaramkr/voila-papers.git",
+    "source_path": "ICDE_2027/paper/source"
   },
   "google_drive_url": null,
   "google_drive_url_status": "required_before_submission",
+  "icde_specific_artifacts_status": "missing_from_latest_public_repository",
+  "icde_specific_artifacts": [
+    "generated_icde/placement_table.tex",
+    "generated_icde/mission_table.tex",
+    "generated_icde/robustness_pooled.csv",
+    "generated_icde/ood/",
+    "generated_icde/tracker_evidence.txt",
+    "generated_icde/template_coverage.txt",
+    "scripts/mission_all_models.py",
+    "scripts/ood_audit_fallback.py",
+    "scripts/planner_overhead.py"
+  ],
   "bundle_root": "VOILA_ICDE_2027_artifacts",
   "restore_relative_to_repo_root": true,
   "directories": [

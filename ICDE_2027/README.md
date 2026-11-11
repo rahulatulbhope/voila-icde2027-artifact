@@ -7,7 +7,10 @@ Google Drive folder.
 
 ## Paper
 
-- `paper/icde2027_author_edited.pdf` is the supplied edited manuscript.
+- `paper/icde2027_author_edited.pdf` is the current manuscript built from the
+  latest `jayaramkr/voila-papers` ICDE source.
+- The editable source and figures are included under `paper/source/`; build it
+  with `pwsh -File ICDE_2027/paper/build_icde.ps1`.
 - The PDF is 14 pages total: 12 pages of technical content followed by
   references and the AI-generated-content acknowledgement. ICDE 2027 excludes
   references and that acknowledgement from the 12-page limit and prohibits an
@@ -15,9 +18,7 @@ Google Drive folder.
 - The PDF includes an AI-generated-content acknowledgement. The stale text
   extraction in `C:\Users\Rahul\Downloads\icde2027.txt` contains a TODO, but it
   is not the source used for this package.
-- No LaTeX source for this edited PDF was present in the supplied local files;
-  this package therefore preserves the PDF as the submission artifact rather
-  than pretending it can be rebuilt from source.
+- The source snapshot is pinned to GitHub commit `ae78b3f` (2026-11-11).
 
 ## Artifact link
 
@@ -76,6 +77,7 @@ described in the handoff.
 ## Submission checklist
 
 - [x] Edited ICDE PDF is preserved with a recorded SHA-256 hash.
+- [x] Editable ICDE source and figures are included and rebuild successfully.
 - [x] PerCom and ICDE paper masters remain independent.
 - [x] Reproducibility bundle paths and restoration procedure are documented.
 - [ ] Replace the manifest's `google_drive_url` with the real public Drive URL.
@@ -84,3 +86,6 @@ described in the handoff.
 - [ ] Upload the PDF and supplemental URL to the correct ICDE CMT round.
 - [ ] Confirm no concurrent-submission or prior-publication restriction is
       violated.
+- [ ] Upload the complete artifact bundle, including the ICDE-specific
+      `generated_icde` outputs referenced by the paper, or remove claims that
+      cannot be reproduced from the uploaded bundle.
