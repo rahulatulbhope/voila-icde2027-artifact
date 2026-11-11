@@ -1,0 +1,76 @@
+{
+  "artifact_package": "VOILA-ICDE-2027",
+  "paper": {
+    "path": "ICDE_2027/paper/icde2027_author_edited.pdf",
+    "sha256": "f19db14814bff2cd254efd472a70df2eaa41a6ad8932af2efc1d701f5693339a",
+    "pages_total": 14,
+    "technical_pages": 12,
+    "references_and_ai_ack_pages": 2,
+    "source_note": "Supplied edited PDF; editable LaTeX source was not found locally."
+  },
+  "google_drive_url": null,
+  "google_drive_url_status": "required_before_submission",
+  "bundle_root": "VOILA_ICDE_2027_artifacts",
+  "restore_relative_to_repo_root": true,
+  "directories": [
+    {
+      "path": "files",
+      "purpose": "Cached dataset/model outputs consumed by the offline runner",
+      "required": true
+    },
+    {
+      "path": "raw_data",
+      "purpose": "FloodNet source archive and reconstructed image payloads",
+      "required": true
+    },
+    {
+      "path": "model_artifacts",
+      "purpose": "Saved router and calibration artifacts",
+      "required": true
+    },
+    {
+      "path": "scripts/model_artifacts",
+      "purpose": "Legacy/generated saved model artifacts referenced by older results",
+      "required": false
+    },
+    {
+      "path": "results/percom2027",
+      "purpose": "Common populations and frozen PerCom analysis inputs",
+      "required": true
+    },
+    {
+      "path": "results/percom2027_final",
+      "purpose": "Measured payload sizes and normalized-cost frozen results",
+      "required": true
+    },
+    {
+      "path": "results/percom2027_final_bytes",
+      "purpose": "Measured-byte routing, stress, mission, and system results",
+      "required": true
+    },
+    {
+      "path": "results/percom2027_submission",
+      "purpose": "Submission snapshot used by the checked-in paper-facing outputs",
+      "required": true
+    },
+    {
+      "path": "results/cache",
+      "purpose": "Optional runtime/router caches",
+      "required": false
+    }
+  ],
+  "checked_in_provenance": {
+    "generated_manifest": "VOILA_Percom/generated/artifact_manifest.json",
+    "run_handoff": "PERCOM_2027_RUN_HANDOFF.md",
+    "code": [
+      "scripts/run_all_experiments.py",
+      "scripts/percom_experiments.py",
+      "tests/"
+    ]
+  },
+  "claims_boundary": [
+    "No new VLM inference was run for this package.",
+    "No Jetson, edge-energy, carbon, or live on-device caption-generation result is included.",
+    "CellReplay results are based on public cellular traces used as proxies, not disaster-specific traces."
+  ]
+}
