@@ -1,21 +1,20 @@
 # Outputs
 
-This directory documents output locations; the primary checked-in outputs remain beside the paper and scripts so existing paths stay reproducible.
+This directory documents the output layout for the reproducibility package.
 
-## Committed paper-facing outputs
+## Tracked outputs
 
-- `VOILA_Percom/generated/` — CSV summaries, LaTeX tables, figures, bootstrap summaries, and the artifact manifest.
-- `VOILA_Percom/figures/` and `VOILA_Percom/plots/` — paper figures and plot PDFs/PNGs.
-- `VOILA_Percom/percom2027.pdf` and `VOILA_Percom/percom2027_submission.pdf` — latest committed working and submission PDFs.
-- `scripts/results_final/` — compact analysis results used by the existing paper workflow.
+- `scripts/results_final/` — compact JSON/CSV result records and analysis
+  figures.
+- `ICDE_2027/paper/icde2027_author_edited.pdf` — submission PDF only.
 
 ## Generated locally and ignored
 
 - `results/` — experiment outputs and caches.
-- `model_artifacts/` and `scripts/model_artifacts/` — fitted models and calibrators.
+- `model_artifacts/` and `scripts/model_artifacts/` — fitted models and
+  calibrators.
 - `raw_data/` — downloaded datasets and measured payloads.
-- `tmp/` and LaTeX build intermediates — review renders and transient build state.
+- LaTeX/build intermediates and temporary review files.
 
-## Reproducibility
-
-Use `VOILA_Percom/generated/artifact_manifest.json` to verify the checked-in generated files. For a full rerun, follow `PERCOM_2027_RUN_HANDOFF.md`; do not infer missing inputs from the paper PDF alone.
+See `ICDE_2027/artifact/manifest.json` for the external bundle link and
+`ICDE_2027/artifact/restore_artifacts.ps1` for restoration.

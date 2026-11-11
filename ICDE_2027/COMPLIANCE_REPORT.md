@@ -1,14 +1,14 @@
 # ICDE 2027 compliance review
 
 Reviewed against the official ICDE 2027 research-track guidelines and the
-latest `jayaramkr/voila-papers` commit `ae78b3fac43e0475d3e2f2ede8f69cd074260b9f`.
+submission PDF packaged in this repository.
 
 ## Status: conditionally ready
 
 ### Verified
 
-- IEEE conference format: the source uses `IEEEtran` in 10-point conference
-  mode and compiles on US Letter paper.
+- IEEE conference format: the packaged PDF uses the required two-column
+  conference layout on US Letter paper.
 - Length: the rebuilt PDF has 14 pages total. The technical content occupies
   12 pages; references and the AI-generated-content acknowledgement are outside
   the ICDE page limit.
@@ -19,18 +19,16 @@ latest `jayaramkr/voila-papers` commit `ae78b3fac43e0475d3e2f2ede8f69cd074260b9f
   generated code and are responsible for correctness and originality.
 - Single-blind review: author names and affiliations are present, consistent
   with ICDE's single-blind policy.
-- Build: the direct `pdflatex -> bibtex -> pdflatex -> pdflatex` build succeeds
-  with no unresolved citation or reference warnings.
+- PDF integrity: the packaged submission PDF has a recorded SHA-256 hash in
+  `artifact/manifest.json`.
 - Visual review: title page, figures, section transitions, acknowledgement, and
   reference pages render without clipping or overlap.
 
 ### Not yet verified or incomplete
 
-- Supplemental artifacts: the latest public repository contains the paper
-  source and figures but not the `generated_icde` scripts, tables, audit files,
-  or placement/OOD outputs referenced in the source comments. ICDE requires
-  experiment papers to provide the artifacts needed to reproduce the reported
-  results.
+- Supplemental artifacts: the ICDE-specific generated scripts, tables, audit
+  files, and placement/OOD outputs still need to be present in the downloaded
+  Drive bundle for full reproduction.
 - Public artifact URL: a Google Drive file URL has been supplied and recorded
   in the manifest, but public viewer access and the file's contents still need
   to be tested from a clean/private browser session.

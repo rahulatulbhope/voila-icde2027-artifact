@@ -44,8 +44,6 @@ scripts/results_final_smoke_additional/
 # Local review/build state
 tmp/
 tmp_*.txt
-VOILA_Percom/.claude/
-VOILA_Percom/.git*
 *.aux
 *.log
 *.blg

@@ -7,8 +7,7 @@
     "technical_pages": 12,
     "references_and_ai_ack_pages": 2,
     "source_commit": "ae78b3fac43e0475d3e2f2ede8f69cd074260b9f",
-    "source_repository": "https://github.com/jayaramkr/voila-papers.git",
-    "source_path": "ICDE_2027/paper/source"
+    "source_repository": "https://github.com/jayaramkr/voila-papers.git"
   },
   "google_drive_url": "https://drive.google.com/file/d/1i6orLyJELF1ZFj-bpSZmMcZqAW60SOV7/view?usp=drive_link",
   "google_drive_url_status": "supplied_by_user_pending_public_access_check",
@@ -49,7 +48,7 @@
     },
     {
       "path": "results/percom2027",
-      "purpose": "Common populations and frozen PerCom analysis inputs",
+      "purpose": "Common populations and frozen routing-analysis inputs",
       "required": true
     },
     {
@@ -64,7 +63,7 @@
     },
     {
       "path": "results/percom2027_submission",
-      "purpose": "Submission snapshot used by the checked-in paper-facing outputs",
+      "purpose": "Submission snapshot used by the checked-in result records",
       "required": true
     },
     {
@@ -74,8 +73,6 @@
     }
   ],
   "checked_in_provenance": {
-    "generated_manifest": "VOILA_Percom/generated/artifact_manifest.json",
-    "run_handoff": "PERCOM_2027_RUN_HANDOFF.md",
     "code": [
       "scripts/run_all_experiments.py",
       "scripts/percom_experiments.py",
